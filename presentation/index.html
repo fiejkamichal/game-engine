@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>AI Generation w praktyce: Od teorii do zastosowania</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0d12;
+      --panel: #11141d;
+      --panel-2: #1a1e2b;
+      --border: #222736;
+      --fg: #e7e9ee;
+      --fg-2: #c8ccd6;
+      --muted: #7e8597;
+      --accent: #4f8cff;
+      --accent-2: #8b5cf6;
+      --danger: #f87171;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8vh 9vw;
+    }
+    .slide.active { display: flex; }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 2.5vh;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 3.5vh;
+    }
+    h3 {
+      font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+      line-height: 1.3;
+      font-weight: 600;
+      margin-bottom: 1.5vh;
+      color: var(--accent);
+    }
+    p, li {
+      font-size: clamp(1rem, 1.4vw, 1.4rem);
+      line-height: 1.55;
+      color: var(--fg-2);
+    }
+
+    .lead { color: var(--fg); font-size: clamp(1.1rem, 1.6vw, 1.6rem); }
+
+    ul { list-style: none; padding-left: 0; }
+    ul li {
+      position: relative;
+      padding-left: 1.6em;
+      margin-bottom: 1.2vh;
+    }
+    ul li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3vw;
+      align-items: stretch;
+    }
+    .columns-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5vw;
+      align-items: stretch;
+    }
+
+    .card {
+      padding: 3.5vh 2.5vw;
+      border: 1px solid var(--border);
+      border-radius: 0.9rem;
+      background: var(--panel);
+      display: flex;
+      flex-direction: column;
+      gap: 1vh;
+    }
+    .card.bad h3 { color: var(--danger); }
+    .card.bad ul li::before { color: var(--danger); }
+
+    .accent { color: var(--accent); }
+    .accent-2 { color: var(--accent-2); }
+    .muted { color: var(--muted); }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: var(--panel-2);
+      padding: 0.15em 0.45em;
+      border-radius: 0.35em;
+      font-size: 0.92em;
+      color: var(--fg);
+    }
+
+    pre {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 0.6rem;
+      padding: 2vh 1.8vw;
+      font-family: ui-monospace, monospace;
+      font-size: clamp(0.85rem, 1.05vw, 1.05rem);
+      line-height: 1.6;
+      margin-top: 2vh;
+      color: var(--fg-2);
+      overflow: auto;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 2vh;
+      left: 9vw;
+      right: 9vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #555a6d;
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 2vh;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.4rem;
+      z-index: 10;
+    }
+    .nav button {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--fg-2);
+      padding: 0.5rem 0.9rem;
+      border-radius: 0.45rem;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      font-family: inherit;
+    }
+    .nav button:hover { background: #232838; color: var(--fg); }
+    .nav button:disabled { opacity: 0.35; cursor: default; }
+    .nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent);
+      transition: width 0.25s ease;
+      z-index: 11;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-right: 0.5rem;
+    }
+    .pill.on { color: var(--accent); border-color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .columns, .columns-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress" style="width: 0%"></div>
+
+  <main class="deck" id="deck">
+
+    <section class="slide active" data-title="Tytul">
+      <p class="eyebrow">Warsztat • 1,5 h • Polski</p>
+      <h1>AI Generation w praktyce<br><span class="accent">Od teorii do zastosowania</span></h1>
+      <p class="lead" style="margin-top: 5vh; max-width: 50ch;">
+        Systemy wieloagentowe, vibe coding, jeden kod &mdash; cztery role.
+        Engine gier turowych jako pretekst do mówienia o&nbsp;architekturze AI.
+      </p>
+    </section>
+
+    <section class="slide" data-title="Agenda">
+      <p class="eyebrow">Plan na 90 minut</p>
+      <h2>Agenda</h2>
+      <ul>
+        <li><strong>30&ndash;40 min &mdash; Teoria.</strong> Czym <em>są</em> i&nbsp;czym <em>nie są</em> systemy wieloagentowe AI. Orkiestracja, kontrakty, skille.</li>
+        <li><strong>40&ndash;50 min &mdash; Praktyka.</strong> Vibe coding na żywym repo. Dopinasz funkcję w&nbsp;~10 minut, używając darmowego copilota.</li>
+        <li><strong>10 min &mdash; Q&amp;A.</strong> Pytania, kierunki dalszej pracy, materiały.</li>
+      </ul>
+      <p class="muted" style="margin-top: 4vh;">Wymagania: laptop, internet, darmowe konto AI (np. ChatGPT).</p>
+    </section>
+
+    <section class="slide" data-title="Krajobraz">
+      <p class="eyebrow">Sekcja 1 &mdash; Krajobraz</p>
+      <h2>Gdzie w&nbsp;tym wszystkim są agenci</h2>
+      <div class="columns-3">
+        <div class="card">
+          <h3>Prompt</h3>
+          <p>Pojedyncza instrukcja dla LLM. Bez stanu, bez pętli, bez narzędzi. Najmniejsza jednostka.</p>
+        </div>
+        <div class="card">
+          <h3>RAG</h3>
+          <p>Prompt wzbogacony danymi z&nbsp;zewnętrznej bazy. Tutaj &mdash; tylko jako kontrast, nie jest tematem warsztatu.</p>
+        </div>
+        <div class="card">
+          <h3>Agent</h3>
+          <p>Decyzyjna jednostka z&nbsp;rolą, celem i&nbsp;granicami. Pętla obserwacja&rarr;decyzja&rarr;akcja. Może <em>używać</em> RAG i&nbsp;skilli.</p>
+        </div>
+      </div>
+      <p class="muted" style="margin-top: 4vh;">Każde z&nbsp;tych narzędzi rozwiązuje inny problem. Mylenie ich kosztuje czas i&nbsp;pieniądze.</p>
+    </section>
+
+    <section class="slide" data-title="Czym jest agent">
+      <p class="eyebrow">Sekcja 2 &mdash; Definicja</p>
+      <h2>Czym <span class="accent">jest</span> agent &mdash; a&nbsp;czym <span style="color: var(--danger)">nie jest</span></h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Agent JEST</h3>
+          <ul>
+            <li>Jednostką z&nbsp;rolą i&nbsp;misją</li>
+            <li>Pętlą decyzyjną (obserwuje, decyduje, działa)</li>
+            <li>Konsumentem narzędzi i&nbsp;skilli</li>
+            <li>Częścią systemu z&nbsp;jasnymi granicami</li>
+          </ul>
+        </div>
+        <div class="card bad">
+          <h3>Agent NIE jest</h3>
+          <ul>
+            <li>Pojedynczym promptem</li>
+            <li>Czat-botem ogólnego przeznaczenia</li>
+            <li>Samą bazą wiedzy (RAG)</li>
+            <li>Skillem ani narzędziem &mdash; <em>używa</em> ich</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Architektura">
+      <p class="eyebrow">Sekcja 3 &mdash; Architektura wieloagentowa</p>
+      <h2>Jeden kod, cztery role</h2>
+      <ul>
+        <li><strong class="accent">Orchestrator</strong> &mdash; jedyny interfejs człowieka. Tłumaczy intencję na zadania, scala wyniki.</li>
+        <li><strong class="accent">Architect</strong> &mdash; kontrakty typów, ADR-y, decyzje strukturalne. Pisze spec, nie kod.</li>
+        <li><strong class="accent">Backend Developer</strong> &mdash; engine, walidacja ruchu, plik stanu, API.</li>
+        <li><strong class="accent">Frontend Developer</strong> &mdash; rendering planszy, klikalność, stan UI.</li>
+      </ul>
+      <p class="muted" style="margin-top: 4vh;">
+        Każdy zna swoje granice. Człowiek rozmawia tylko z&nbsp;orkiestratorem &mdash; <em>jeden kanał</em>, nie cztery.
+      </p>
+    </section>
+
+    <section class="slide" data-title="Skille vs agenci">
+      <p class="eyebrow">Sekcja 4 &mdash; Skille</p>
+      <h2>Skill <span class="muted">to nie</span> agent</h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Skill</h3>
+          <p>Proceduralne <em>know-how</em>. Instrukcja typu &bdquo;jak to zrobić&rdquo;. Bez autonomii, bez roli.</p>
+          <p class="muted" style="margin-top: 1vh;">
+            Przykład:
+            <code>file-io-safety</code>,
+            <code>commit-message</code>,
+            <code>write-adr</code>.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Agent</h3>
+          <p>Decyzyjna jednostka z&nbsp;rolą, misją i&nbsp;granicami. <em>Sięga</em> po skille, kiedy są potrzebne.</p>
+          <p class="muted" style="margin-top: 1vh;">
+            Przykład:
+            <code>orchestrator</code>,
+            <code>architect</code>,
+            <code>backend-developer</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Wzorzec promptu">
+      <p class="eyebrow">Sekcja 5 &mdash; Wzorzec promptu</p>
+      <h2>Jak napisać prompt, który <em>generuje agenta</em></h2>
+      <ul>
+        <li><strong class="accent">Rola</strong> &mdash; kim jest, jakie ma kompetencje.</li>
+        <li><strong class="accent">Cel</strong> &mdash; co produkuje, na czym polega sukces.</li>
+        <li><strong class="accent">Zakres</strong> &mdash; co należy do agenta, co nie.</li>
+        <li><strong class="accent">Twarde ograniczenia</strong> &mdash; czego nie wolno (np. &bdquo;nie dotyka UI&rdquo;).</li>
+        <li><strong class="accent">Kontrakt wyjścia</strong> &mdash; format, struktura, kryteria akceptacji.</li>
+      </ul>
+      <p class="muted" style="margin-top: 4vh;">
+        Te same pięć rubryk znajdziesz w&nbsp;każdym pliku <code>agents/*.md</code> w&nbsp;tym repo.
+      </p>
+    </section>
+
+    <section class="slide" data-title="Repo">
+      <p class="eyebrow">Sekcja 6 &mdash; Nasze repo</p>
+      <h2>Engine + dwie gry + cztery role</h2>
+      <p>
+        Sygnał jakości architektury: dodanie trzeciej gry nie wymaga zmian w&nbsp;silniku
+        &mdash; tylko nowego folderu pod <code>packages/games/</code>.
+      </p>
+<pre>apps/web/                Next.js &mdash; UI + API routes
+packages/engine/         silnik, gra-agnostyczny
+packages/games/
+  &#9500;&#9472; tic-tac-toe/         manifest + zasady
+  &#9492;&#9472; checkers/            manifest + zasady
+data/matches/            stan rozgrywki (.json)
+agents/                  cztery role
+skills/                  proceduralne know-how
+docs/architecture/       ADR-y</pre>
+    </section>
+
+    <section class="slide" data-title="Vibe Coding">
+      <p class="eyebrow">Część praktyczna</p>
+      <h2>Vibe Coding &mdash; instrukcja</h2>
+      <ul>
+        <li>Sklonuj repo: <code>git clone &amp;&amp; npm install &amp;&amp; npm run dev</code>.</li>
+        <li>Otwórz darmowy AI copilot w&nbsp;przeglądarce (np. ChatGPT z&nbsp;darmowym kontem).</li>
+        <li>Wybierz jedno zadanie z&nbsp;listy &bdquo;dopnij funkcję&rdquo;.</li>
+        <li>Wklej kontekst: <code>agents/*.md</code>, odpowiedni <code>GameDefinition</code>, fragment komponentu UI.</li>
+        <li>Masz ~10 minut na działający rezultat. Iteruj &mdash; krótkie cykle, nie jeden mega-prompt.</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-title="Zadanie">
+      <p class="eyebrow">Twoje zadanie</p>
+      <h2>Kryteria sukcesu</h2>
+      <ul>
+        <li>Funkcja działa po odświeżeniu strony.</li>
+        <li>Stan zapisuje się do pliku <code>data/matches/&lt;id&gt;.json</code> &mdash; otwórz i&nbsp;sprawdź.</li>
+        <li>Nie psujesz drugiej gry (tic-tac-toe ↔ warcaby działają niezależnie).</li>
+        <li>Jeden commit, conventional commits (<code>feat:</code>, <code>fix:</code>, <code>refactor:</code>).</li>
+      </ul>
+      <p class="muted" style="margin-top: 4vh;">
+        Bonus: dorzucasz krótkie ADR-ko w&nbsp;<code>docs/architecture/</code>, jeżeli decyzja jest nietrywialna.
+      </p>
+    </section>
+
+    <section class="slide" data-title="QA">
+      <p class="eyebrow">Q&amp;A</p>
+      <h1>Pytania?</h1>
+      <p class="lead" style="margin-top: 5vh;">
+        Eksperymenty, kierunki rozwoju, &bdquo;czy mogę zrobić X&rdquo;.
+      </p>
+      <p class="muted" style="margin-top: 3vh;">
+        Materiały zostają w&nbsp;repo &mdash; możesz wracać. Plan dalszych kroków: <code>workshop/plan/01-action-plan.md</code>.
+      </p>
+    </section>
+
+  </main>
+
+  <div class="footer">
+    <span>AI Generation w praktyce</span>
+    <span><span id="slide-counter">1</span> / <span id="slide-total">11</span></span>
+  </div>
+
+  <div class="nav" role="navigation" aria-label="Nawigacja slajdami">
+    <button id="prev" type="button" aria-label="Poprzedni slajd">&larr;</button>
+    <button id="next" type="button" aria-label="Następny slajd">&rarr;</button>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var total = slides.length;
+      var current = 0;
+      var counter = document.getElementById("slide-counter");
+      var totalEl = document.getElementById("slide-total");
+      var prevBtn = document.getElementById("prev");
+      var nextBtn = document.getElementById("next");
+      var progress = document.getElementById("progress");
+
+      totalEl.textContent = total;
+
+      function show(idx) {
+        idx = Math.max(0, Math.min(total - 1, idx));
+        if (idx === current) {
+          updateChrome();
+          return;
+        }
+        slides[current].classList.remove("active");
+        slides[idx].classList.add("active");
+        current = idx;
+        updateChrome();
+        if (history && history.replaceState) {
+          history.replaceState(null, "", "#" + (current + 1));
+        }
+      }
+
+      function updateChrome() {
+        counter.textContent = current + 1;
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === total - 1;
+        var pct = total <= 1 ? 100 : (current / (total - 1)) * 100;
+        progress.style.width = pct + "%";
+      }
+
+      function next() { show(current + 1); }
+      function prev() { show(current - 1); }
+
+      document.addEventListener("keydown", function (e) {
+        if (e.defaultPrevented) return;
+        if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+          e.preventDefault();
+          next();
+        } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+          e.preventDefault();
+          prev();
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          show(0);
+        } else if (e.key === "End") {
+          e.preventDefault();
+          show(total - 1);
+        }
+      });
+
+      prevBtn.addEventListener("click", prev);
+      nextBtn.addEventListener("click", next);
+
+      var hash = (location.hash || "").replace("#", "");
+      var initial = parseInt(hash, 10);
+      if (!isNaN(initial) && initial >= 1 && initial <= total) {
+        current = initial - 1;
+        slides[0].classList.remove("active");
+        slides[current].classList.add("active");
+      }
+      updateChrome();
+    })();
+  </script>
+</body>
+</html>

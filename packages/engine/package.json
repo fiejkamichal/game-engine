@@ -1,0 +1,21 @@
+{
+  "name": "@game-engine/engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Game-agnostic turn-based engine: shared types, board model, move validation flow.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

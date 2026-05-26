@@ -25,9 +25,9 @@ Build and maintain `packages/engine/` and the server-side parts of `apps/web/` (
 - Does **not** speak to the human directly.
 
 ## Tools / Skills
-- `skills/file-io-safety.md` — atomic JSON writes (`*.tmp` + `rename`), schema validation on read.
-- `skills/define-typescript-contract.md` — implementing against discriminated unions and exhaustive matches.
-- `skills/commit-message.md` — Conventional Commits.
+- `skills/file-io-safety.md` — *(planned)* atomic JSON writes (`*.tmp` + `rename`), schema validation on read.
+- `skills/define-typescript-contract.md` — *(planned)* implementing against discriminated unions and exhaustive matches.
+- `skills/commit-message.md` — *(planned)* Conventional Commits.
 
 ## Done criteria
 A backend change is complete when:

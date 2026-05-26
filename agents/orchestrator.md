@@ -25,7 +25,7 @@ Turn ambiguous human requests into a small set of well-scoped, contract-bound ta
 - Does **not** bypass another agent's domain even when "it would be faster" — bypass kills the contract.
 
 ## Tools / Skills
-- `skills/commit-message.md` — Conventional Commits format.
+- `skills/commit-message.md` — *(planned)* Conventional Commits format.
 - `skills/write-task-brief.md` — *(planned)* template for task briefs handed to specialist agents.
 - Read-only access to all repository files and ADRs to ground task briefs in current state.
 

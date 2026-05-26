@@ -54,6 +54,7 @@ Kryterium nadrzędne: po `git clone && npm install && npm run dev` działa aplik
 - **Cel:** spisać role i granice czterech agentów.
 - **Działania:** `agents/orchestrator.md`, `architect.md`, `backend-developer.md`, `frontend-developer.md`. Każdy plik: Role / Mission / Inputs / Outputs / Boundaries / Tools&Skills / Done criteria.
 - **DoD:** cztery pliki MD, treść po angielsku, orchestrator jest jedynym, który adresuje człowieka, granice nie nakładają się.
+- **Uwaga:** obok czterech ról specjalistycznych w `agents/` żyje też `agents/workshop-producer.md` — meta-agent dostarczania warsztatu (poza systemem wieloagentowym prezentowanym na warsztacie). Patrz D13.
 
 ### Iteracja 5 — Pierwsze ADR-y i kontrakty typów
 - **Cel:** ustabilizować umowę między engine a grą zanim powstanie kod.
@@ -79,8 +80,9 @@ Kryterium nadrzędne: po `git clone && npm install && npm run dev` działa aplik
 
 ### Iteracja 8 — Domknięcie prezentacji
 - **Cel:** gotowa do prezentowania offline wersja.
+- **Zależność:** wymaga zamknięcia iteracji 6 i 7 — „dograć przykłady z naszego repo" znaczy zacytować realny kod engine + obu gier. Bez nich iter 8 może iść co najwyżej strukturalnie.
 - **Działania:** uzupełnić wszystkie sekcje treścią, dograć przykłady z naszego repo, zrobić sanity-check zero-network.
-- **DoD:** wszystkie sekcje z sekcji 6 promptu obecne; otwarcie z dysku → zero żądań sieciowych; działa na Chromie i Firefoxie.
+- **DoD:** wszystkie sekcje z sekcji 6 promptu obecne; otwarcie z dysku → zero żądań sieciowych; działa na Chromie i Firefoxie; co najmniej jeden slajd cytuje konkretny fragment z `packages/engine/` lub `packages/games/*/`.
 
 ### Iteracja 9 — Skille + przewodnik prowadzącego
 - **Cel:** zoperacjonalizować rozróżnienie skill vs agent.
@@ -119,6 +121,7 @@ Każda z tych decyzji powinna trafić do ADR-u, kiedy będzie pierwszy raz konsu
 | D10 | **Engine zna tylko: 2 graczy / tury / kwadratowa plansza / pionki B/C / klikalność** | Wszystko inne deklaruje gra. To jest puenta architektoniczna. |
 | D11 | **Bez bazy danych, bez Redisa, bez serwera stanu** | Pliki JSON w repo wystarczają. |
 | D12 | **Dev server: `next dev` (Webpack)**, nie `--turbopack` | Stabilność > marginalny zysk czasu kompilacji w demo. |
+| D13 | **Meta-agent dostarczania (`agents/workshop-producer.md`) żyje obok czterech ról specjalistycznych** | Cztery role (orchestrator, architect, backend-developer, frontend-developer) są częścią **curriculum** warsztatu — to one są przykładem systemu wieloagentowego, który pokazujemy uczestnikom. Workshop-producer jest **meta-agentem dostarczania** — odpowiada za pchnięcie planu z `01-action-plan.md` o jeden inkrement w każdym wywołaniu, nie ma roli w prezentowanym systemie. Współdzieli folder `agents/` z czterema rolami dla spójności formatu pliku, ale jego scope jest rozłączny i nie jest cytowany w prezentacji. |
 
 ---
 

@@ -4,7 +4,7 @@
 
 **Status:** 4 z 10 iteracji domkniętych (~33% pracy za nami).
 **Aktywna iteracja:** Iter 5 — Pierwsze ADR-y i kontrakty typów.
-**Ostatnia aktualizacja:** 2026-05-26.
+**Ostatnia aktualizacja:** 2026-05-26 (sprint reflektywny: domknięcie trzech otwartych ryzyk).
 
 | #  | Iteracja                        | Status | Dowód / blocker                                                                  |
 |----|---------------------------------|--------|----------------------------------------------------------------------------------|
@@ -21,6 +21,8 @@
 
 ## Otwarte ryzyka wychwycone przy re-readzie
 
-- **Broken skill references** — `agents/{architect,backend-developer,frontend-developer}.md` cytują pliki `skills/*.md`, które jeszcze nie istnieją (powstaną w iter 9). Łamie bramkę walidacji workshop-producera.
-- **Iter 8 ↔ iter 6/7 dependency** — niezadeklarowana w planie. Iter 8 nie domknie się, dopóki nie ma engine + dwóch gier do zacytowania.
-- **Meta-agent w `agents/`** — `agents/workshop-producer.md` istnieje (untracked), ale iter 4 mówi „cztery role". Albo dorzucić go jawnie do planu, albo wynieść poza `agents/`.
+Brak otwartych ryzyk strukturalnych. Trzy wcześniej zidentyfikowane zostały domknięte w sprincie reflektywnym 2026-05-26:
+
+- ~~**Broken skill references**~~ — rozwiązane: wszystkie referencje do nieistniejących skilli w `agents/*.md` są oznaczone `*(planned)*`; bramka walidacji workshop-producera (krok 5) wyłącza te referencje z check'a do iteracji 9.
+- ~~**Iter 8 ↔ iter 6/7 dependency**~~ — rozwiązane: zadeklarowana wprost w opisie iteracji 8 w [`01-action-plan.md`](./01-action-plan.md).
+- ~~**Meta-agent w `agents/`**~~ — rozwiązane: `agents/workshop-producer.md` ujęty jawnie w planie (uwaga w iter 4 + decyzja D13 wyjaśniająca, czemu meta-agent dostarczania żyje obok czterech ról curriculum).

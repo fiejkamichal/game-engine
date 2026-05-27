@@ -7,6 +7,7 @@
  */
 
 import type { GameDefinition, Move } from "@game-engine/engine";
+import { checkers } from "@game-engine/checkers";
 import { ticTacToe } from "@game-engine/tic-tac-toe";
 
 const registry = new Map<string, GameDefinition>();
@@ -18,6 +19,7 @@ function register<TKind extends string, TMove extends Move>(
 }
 
 register(ticTacToe);
+register(checkers);
 
 export function getGame(gameId: string): GameDefinition | null {
   return registry.get(gameId) ?? null;

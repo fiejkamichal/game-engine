@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@game-engine/checkers": "*",
     "@game-engine/engine": "*",
     "@game-engine/tic-tac-toe": "*",
     "next": "^15.1.0",

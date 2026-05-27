@@ -3,11 +3,13 @@
 import { useState } from "react";
 
 import type {
+  Cell,
   GameState,
   Move,
   MoveError,
-  Piece,
 } from "@game-engine/engine";
+
+import { getGameUi } from "@/lib/games-ui";
 
 interface Props {
   readonly initialState: GameState;
@@ -21,11 +23,6 @@ const PLAYER_LABEL: Record<string, string> = {
   white: "Biały",
   black: "Czarny",
 };
-
-function pieceLabel(piece: Piece | null | undefined): string {
-  if (!piece) return "";
-  return piece.kind.toUpperCase();
-}
 
 function playerLabel(player: string): string {
   return PLAYER_LABEL[player] ?? player;
@@ -57,12 +54,12 @@ export function MatchBoard({ initialState }: Props) {
   const [state, setState] = useState<GameState>(initialState);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCells, setSelectedCells] = useState<ReadonlyArray<Cell>>([]);
+
+  const ui = getGameUi(state.gameId);
 
   async function sendMove(move: Move) {
-    if (busy) return;
-    if (state.outcome.status !== "ongoing") return;
     setBusy(true);
-    setError(null);
     try {
       const res = await fetch(`/api/matches/${state.matchId}/moves`, {
         method: "POST",
@@ -88,12 +85,35 @@ export function MatchBoard({ initialState }: Props) {
   }
 
   function onCellClick(row: number, col: number) {
-    const move = { kind: "place" as const, cell: { row, col } };
-    void sendMove(move);
+    if (busy) return;
+    if (state.outcome.status !== "ongoing") return;
+
+    const cell: Cell = { row, col };
+    const nextSelection = [...selectedCells, cell];
+    const result = ui.buildMove(state, nextSelection);
+
+    if (result.status === "ready") {
+      setSelectedCells([]);
+      setError(null);
+      void sendMove(result.move);
+      return;
+    }
+    if (result.status === "need-more") {
+      setSelectedCells(nextSelection);
+      setError(null);
+      return;
+    }
+    setSelectedCells([]);
+    setError(result.error);
+  }
+
+  function isSelected(row: number, col: number): boolean {
+    return selectedCells.some((c) => c.row === row && c.col === col);
   }
 
   const finished = state.outcome.status !== "ongoing";
   const cols = state.board[0]?.length ?? 1;
+  const cellSize = cols <= 4 ? "h-20 w-20 text-3xl" : "h-12 w-12 text-xl";
 
   return (
     <section
@@ -114,8 +134,17 @@ export function MatchBoard({ initialState }: Props) {
       >
         {state.board.map((row, rowIdx) =>
           row.map((cell, colIdx) => {
-            const occupied = cell !== null;
-            const disabled = finished || busy || occupied;
+            const selected = isSelected(rowIdx, colIdx);
+            const disabled = finished || busy;
+            const baseCellClass = ui.boardCellClass({
+              row: rowIdx,
+              col: colIdx,
+            });
+            const pieceRender = cell !== null ? ui.renderPiece(cell) : null;
+            const ringClass = selected
+              ? "ring-2 ring-sky-400"
+              : "ring-1 ring-neutral-700/50";
+
             return (
               <button
                 key={`${rowIdx}-${colIdx}`}
@@ -123,21 +152,29 @@ export function MatchBoard({ initialState }: Props) {
                 role="gridcell"
                 onClick={() => onCellClick(rowIdx, colIdx)}
                 disabled={disabled}
-                className={`flex h-20 w-20 items-center justify-center rounded-md text-3xl font-bold transition ${
-                  occupied
-                    ? "bg-neutral-900 text-neutral-100"
-                    : "bg-neutral-800 text-neutral-100 hover:bg-neutral-700"
-                } disabled:cursor-not-allowed disabled:opacity-60`}
+                className={`flex items-center justify-center rounded-md font-bold transition ${cellSize} ${baseCellClass} ${ringClass} disabled:cursor-not-allowed disabled:opacity-70`}
                 aria-label={`Pole wiersz ${rowIdx + 1}, kolumna ${colIdx + 1}${
-                  cell ? `, zajęte: ${cell.kind}` : ", puste"
-                }`}
+                  cell ? `, zajęte: ${cell.owner} ${cell.kind}` : ", puste"
+                }${selected ? ", zaznaczone" : ""}`}
               >
-                {pieceLabel(cell)}
+                <span className={pieceRender?.className ?? ""}>
+                  {pieceRender?.label ?? ""}
+                </span>
               </button>
             );
           }),
         )}
       </div>
+
+      {selectedCells.length > 0 && !finished && (
+        <p className="text-sm text-sky-300" aria-live="polite">
+          Zaznaczono {selectedCells.length} z {ui.maxSelection} pól. Kliknij{" "}
+          {ui.maxSelection - selectedCells.length === 1
+            ? "ostatnie pole"
+            : `${ui.maxSelection - selectedCells.length} kolejnych pól`}{" "}
+          aby dokończyć ruch.
+        </p>
+      )}
 
       {error !== null && (
         <p className="text-sm text-red-400" role="alert">

@@ -1,0 +1,24 @@
+{
+  "name": "@game-engine/tic-tac-toe",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Tic-tac-toe game definition implementing @game-engine/engine's GameDefinition contract.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@game-engine/engine": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

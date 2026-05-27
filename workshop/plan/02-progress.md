@@ -2,9 +2,9 @@
 
 > Migawka stanu z dysku. Plan ([`01-action-plan.md`](./01-action-plan.md)) jest umową, ten plik mówi, gdzie naprawdę jesteśmy. Tracker odświeża workshop-producer na koniec każdego sprintu (krok 6 operating loopu).
 
-**Status:** 5 z 10 iteracji domkniętych (~50% pracy za nami).
-**Aktywna iteracja:** Iter 6 — Engine + tic-tac-toe end-to-end.
-**Ostatnia aktualizacja:** 2026-05-26 (sprint Architekta: domknięcie iter 5 — ADR-y + kontrakty typów).
+**Status:** 6 z 10 iteracji domkniętych (~60% pracy za nami).
+**Aktywna iteracja:** Iter 7 — Checkers jako dowód oddzielenia.
+**Ostatnia aktualizacja:** 2026-05-27 (sprint Backend + Frontend: domknięcie iter 6 — engine runtime + tic-tac-toe + API + UI end-to-end).
 
 | #  | Iteracja                        | Status | Dowód / blocker                                                                                 |
 |----|---------------------------------|--------|-------------------------------------------------------------------------------------------------|
@@ -12,10 +12,10 @@
 | 2  | Szkielet Next.js                | DONE   | `apps/web/` (Next.js 15 + React 19 + Tailwind v4), `npm run dev` startuje                       |
 | 3  | Draft prezentacji               | DONE   | `presentation/index.html` — 11 slajdów, inline CSS+JS, offline                                  |
 | 4  | Agenci                          | DONE   | `agents/{orchestrator,architect,backend-developer,frontend-developer}.md` + meta `workshop-producer.md` |
-| 5  | ADR-y + kontrakty typów         | DONE   | `docs/architecture/{0001-engine-vs-game-split,0002-game-definition-contract}.md` + `packages/engine/src/{types,index}.ts`, `tsc --noEmit` green |
-| 6  | Engine + tic-tac-toe end-to-end | ACTIVE | typy gotowe (`@game-engine/engine`), brak runtime'u, brak `packages/games/tic-tac-toe/`, brak API routes |
-| 7  | Checkers                        | TODO   | brak `packages/games/checkers/`                                                                 |
-| 8  | Domknięcie prezentacji          | TODO   | strukturalnie gotowa, czeka na konkretne przykłady kodu z iter 6/7                              |
+| 5  | ADR-y + kontrakty typów         | DONE   | `docs/architecture/{0001-engine-vs-game-split,0002-game-definition-contract}.md` + `packages/engine/src/{types,index}.ts` |
+| 6  | Engine + tic-tac-toe end-to-end | DONE   | `packages/engine/src/engine.ts` runtime, `packages/games/tic-tac-toe/`, API routes `/api/{games,matches,matches/[id],matches/[id]/moves}`, UI `app/page.tsx` + `app/match/[id]/`, smoke test: utworzony mecz → ruch → wygrana → plik w `data/matches/` |
+| 7  | Checkers                        | ACTIVE | brak `packages/games/checkers/` — celem dowód, że dodanie gry nie dotyka `packages/engine/`     |
+| 8  | Domknięcie prezentacji          | TODO   | strukturalnie gotowa, ma już co cytować z iter 6 — czeka jeszcze na checkers z iter 7           |
 | 9  | Skille + przewodnik             | TODO   | `skills/` puste, brak `workshop/facilitator-notes.md`                                           |
 | 10 | Polish pass                     | TODO   | `README.md` ma jedną linię, brak sanity-checku na czystej maszynie                              |
 

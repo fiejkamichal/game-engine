@@ -1,9 +1,13 @@
 /**
  * Public entry point for `@game-engine/engine`.
  *
- * For iteration 5 this package ships type contracts only; the runtime
- * (applyMove / validateMove / getOutcome / createInitialState) lands in
- * iteration 6 and will be re-exported from this same file.
+ * Exposes:
+ *   - Type contracts (`GameDefinition`, `GameState`, `Move`, ...) — the
+ *     surface every game implements and every consumer reads.
+ *   - Engine runtime (`applyMove`, `createInitialState`, `togglePlayer`) —
+ *     the implementation of the six-step move-flow from ADR 0002.
+ *
+ * See `docs/architecture/0001-engine-vs-game-split.md` for the rationale.
  */
 
 export type {
@@ -19,4 +23,6 @@ export type {
   Outcome,
   Piece,
   Player,
-} from "./types.js";
+} from "./types";
+
+export { applyMove, createInitialState, togglePlayer } from "./engine";

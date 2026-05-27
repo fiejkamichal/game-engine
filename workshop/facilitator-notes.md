@@ -78,7 +78,11 @@ Na stronie głównej dodaj sekcję z licznikami: ile zakończonych meczów wygra
 
 ### Z5 — Trzecia gra
 
-Wzór: skopiuj `packages/games/tic-tac-toe/` na `packages/games/connect-4-mini/` (np. 4×4 plansza, 3 w rzędzie wygrywa). Zarejestruj w `apps/web/lib/games-registry.ts`. **Bramka jakości:** dodanie tej gry **nie wymaga** zmian pod `packages/engine/`. Jeżeli musisz coś tam zmienić — sygnał, że kontrakt jest niekompletny.
+Wzór: skopiuj `packages/games/tic-tac-toe/` na `packages/games/othello-mini/`. Implementacja uproszczonego Othello — plansza 6×6, start z czterema pionami w środku (białe na `(2,3)` i `(3,2)`, czarne na `(2,2)` i `(3,3)`). Ruch: postaw piona na pustym polu tak, by w którymś z 8 kierunków (poziom, pion, skos) zamknąć ciąg ≥1 pionów przeciwnika między nowym pionem a innym pionem własnym; wszystkie zamknięte piony zmieniają właściciela. Koniec gry: plansza pełna albo żaden gracz nie ma legalnego ruchu — wygrywa kto ma więcej pionów (równo = remis).
+
+Zarejestruj w `apps/web/lib/games-registry.ts` i dodaj wpis do `apps/web/lib/games-ui.ts` (`maxSelection: 1`, `●` w innym kolorze dla każdego gracza — najbliżej tic-tac-toe). **Podpowiedź:** wydziel helper `flipsForMove(state, cell)` zwracający listę pól do odwrócenia — `validateMove` odrzuca ruch, gdy lista pusta; `applyMove` używa tej samej listy do mutacji planszy.
+
+**Bramka jakości:** dodanie tej gry **nie wymaga** zmian pod `packages/engine/`. Jeżeli musisz coś tam zmienić — sygnał, że kontrakt jest niekompletny.
 
 ## Fallbacki
 

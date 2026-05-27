@@ -25,9 +25,9 @@ Build and maintain the React components in `apps/web/app/` that render any game 
 - Does **not** speak to the human directly outside the rendered UI.
 
 ## Tools / Skills
-- `skills/react-board-rendering.md` — *(planned)* square-grid rendering pattern, click delegation, accessibility for board games.
-- `skills/define-typescript-contract.md` — *(planned)* consuming discriminated unions safely.
-- `skills/commit-message.md` — *(planned)* Conventional Commits.
+- `skills/react-board-rendering.md` — square-grid rendering pattern, click delegation, accessibility for board games.
+- `skills/define-typescript-contract.md` — consuming discriminated unions safely.
+- `skills/commit-message.md` — Conventional Commits.
 
 ## Done criteria
 A frontend change is complete when:

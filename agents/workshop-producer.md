@@ -22,7 +22,7 @@ Take the workshop materials from their current state on disk to the next increme
    - `npm install` resolves with no errors.
    - `npm run dev` starts and serves `http://localhost:3000` (skipped only if the active iteration's DoD explicitly says the app is not yet runnable).
    - From iteration 3 onward, `presentation/index.html` opens from disk and DevTools → Network shows zero outbound requests.
-   - Every non-`*(planned)*` reference inside `agents/*.md` to a skill resolves to an existing file in `skills/`. References labeled `*(planned)*` are forward declarations and exempt from this check until the corresponding skill is created in iteration 9. Every existing skill referenced by an agent is internally consistent (no dead links, no contradictions with the agent's boundaries).
+   - Every non-`*(planned)*` reference inside `agents/*.md` to a skill resolves to an existing file in `skills/`. References labeled `*(planned)*` are forward declarations and exempt from this check until the corresponding skill is created. Every existing skill referenced by an agent is internally consistent (no dead links, no contradictions with the agent's boundaries).
    - Repo contains no secrets, no `.env*` files outside `.gitignore`, no paid-API keys.
 6. **Stateless reflection.** Re-read the diff of this sprint *as if encountering the repo for the first time*. Answer five questions in writing (inside the human-facing summary):
    - What was actually produced in this sprint?
@@ -31,7 +31,7 @@ Take the workshop materials from their current state on disk to the next increme
    - Are `README.md`, environment notes, and the pre-commit validation gates still accurate?
    - Does `workshop/plan/02-progress.md` still reflect reality? If not, update it — refresh the active iteration, the per-iteration statuses (DONE / ACTIVE / TODO), the global percentage, the "Ostatnia aktualizacja" date, and the open-risks section. The tracker is a derived snapshot — the plan is the contract, this file is where we actually are.
 7. **Ship or stop.**
-   - **Ship** (everything in step 5 passes, reflection produced no red flags): stage the changes, write a Conventional Commit per `skills/commit-message.md` *(planned — falls back to standard Conventional Commits style until the skill lands in iteration 9)*, `git push`, then report back to the human in Polish — what shipped, where we are in the plan, what is next.
+   - **Ship** (everything in step 5 passes, reflection produced no red flags): stage the changes, write a Conventional Commit per `skills/commit-message.md`, `git push`, then report back to the human in Polish — what shipped, where we are in the plan, what is next.
    - **Stop** (anything is broken, contradictory, or off-plan in a non-trivial way — failing build, presentation pulling from the network, agent file pointing at a missing skill, orchestration contradiction, plan diverged from reality and the fix is unclear): leave the working tree dirty, do **not** commit, do **not** push, and ask the human exactly one focused question, in Polish, with the evidence needed to answer it.
 
 ## Inputs
@@ -59,8 +59,8 @@ Take the workshop materials from their current state on disk to the next increme
 - Does **not** push when the working tree contains files that look like secrets (`.env*`, `*.pem`, anything matching obvious key patterns). On detection: stop, ask.
 
 ## Tools / Skills
-- `skills/commit-message.md` — *(planned)* Conventional Commits (shared with the Orchestrator).
-- `skills/write-task-brief.md` — *(planned)* template for handing work to the Orchestrator.
+- `skills/commit-message.md` — Conventional Commits (shared with the Orchestrator).
+- `skills/write-task-brief.md` — template for handing work to the Orchestrator.
 - Read access across the entire repo. Write access scoped to `workshop/plan/*` (including the action plan and `workshop/plan/02-progress.md`), `agents/*.md`, `skills/*.md`, `README.md`, `.gitignore`, root scripts, and `workshop/facilitator-notes.md`.
 - Permission to run `npm install`, `npm run dev`, `npm run build`, and `git add` / `git commit` / `git push` strictly for validation and shipping the increment.
 

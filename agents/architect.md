@@ -25,8 +25,8 @@ Keep the engine **game-agnostic** and the games **engine-compatible**. Define th
 - A spec without an ADR is unfinished work — every contract change is justified somewhere.
 
 ## Tools / Skills
-- `skills/define-typescript-contract.md` — *(planned)* discriminated unions, brand types, exhaustive switches.
-- `skills/write-adr.md` — *(planned)* ADR template (context / decision / alternatives / consequences).
+- `skills/define-typescript-contract.md` — discriminated unions, brand types, exhaustive switches.
+- `skills/write-adr.md` — ADR template (context / decision / alternatives / consequences).
 - Read-only access to all repository code; write access to `docs/architecture/` and `packages/*/src/types.ts`.
 
 ## Done criteria

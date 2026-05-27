@@ -344,21 +344,108 @@
     </section>
 
     <section class="slide" data-title="Repo">
-      <p class="eyebrow">Sekcja 6 &mdash; Nasze repo</p>
+      <p class="eyebrow">Sekcja 6 &mdash; Repo (1 z 3)</p>
       <h2>Engine + dwie gry + cztery role</h2>
       <p>
         Sygnał jakości architektury: dodanie trzeciej gry nie wymaga zmian w&nbsp;silniku
         &mdash; tylko nowego folderu pod <code>packages/games/</code>.
       </p>
-<pre>apps/web/                Next.js &mdash; UI + API routes
-packages/engine/         silnik, gra-agnostyczny
+<pre>apps/web/
+  &#9500;&#9472; app/
+  &#9474;   &#9500;&#9472; api/games/                GET   /api/games
+  &#9474;   &#9500;&#9472; api/matches/              POST  /api/matches
+  &#9474;   &#9500;&#9472; api/matches/[id]/         GET   load
+  &#9474;   &#9500;&#9472; api/matches/[id]/moves/   POST  apply
+  &#9474;   &#9500;&#9472; page.tsx                  lista gier
+  &#9474;   &#9492;&#9472; match/[id]/               plansza + klikalność
+  &#9492;&#9472; lib/                          registry gier, atomic JSON write
+packages/engine/            silnik (types + runtime), gra-agnostyczny
 packages/games/
-  &#9500;&#9472; tic-tac-toe/         manifest + zasady
-  &#9492;&#9472; checkers/            manifest + zasady
-data/matches/            stan rozgrywki (.json)
-agents/                  cztery role
-skills/                  proceduralne know-how
-docs/architecture/       ADR-y</pre>
+  &#9500;&#9472; tic-tac-toe/              GameDefinition (~80 LoC)
+  &#9492;&#9472; checkers/                 GameDefinition (~250 LoC)
+data/matches/{id}.json      stan rozgrywki, JSON na dysku
+agents/                     4 role + meta-agent dostarczania
+docs/architecture/          ADR 0001-2: split + kontrakt
+workshop/plan/              plan + tracker postępu</pre>
+    </section>
+
+    <section class="slide" data-title="Kontrakt">
+      <p class="eyebrow">Sekcja 6 &mdash; Repo (2 z 3)</p>
+      <h2>Cztery linie, które oddzielają engine od gry</h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Kontrakt: <code>GameDefinition</code></h3>
+<pre>interface GameDefinition&lt;TKind, TMove&gt; {
+  readonly id: string;
+  readonly displayName: string;
+  readonly boardSize: BoardSize;
+
+  initialState: (matchId) =&gt; GameState;
+  validateMove: (state, move) =&gt; string | null;
+  applyMove:    (state, move) =&gt; GameState;
+  getOutcome:   (state) =&gt; Outcome;
+}</pre>
+          <p class="muted"><code>packages/engine/src/types.ts</code></p>
+        </div>
+        <div class="card">
+          <h3>Implementacja: tic-tac-toe</h3>
+<pre>validateMove(state, move) {
+  if (move.kind !== "place")
+    return "Unknown move kind.";
+  const { row, col } = move.cell;
+  if (row &lt; 0 || row &gt;= 3 || col &lt; 0 || col &gt;= 3)
+    return "Out of bounds.";
+  if (state.board[row][col] !== null)
+    return "Already occupied.";
+  return null;
+}</pre>
+          <p class="muted"><code>packages/games/tic-tac-toe/src/index.ts</code></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Druga gra">
+      <p class="eyebrow">Sekcja 6 &mdash; Repo (3 z 3)</p>
+      <h2>Druga gra, ten sam kontrakt, <span class="accent">zero zmian w silniku</span></h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Implementacja: warcaby</h3>
+<pre>validateMove(state, move) {
+  // ... bounds + ownership ...
+  const { captures } =
+    allMovesFor(state.board, player);
+
+  if (move.kind === "step") {
+    if (Math.abs(dr) !== 1 || Math.abs(dc) !== 1)
+      return "Krok musi być po skosie.";
+    if (captures.length &gt; 0)
+      return "Bicie jest obowiązkowe.";
+    return null;
+  }
+  if (move.kind === "capture") {
+    // ... validate jump ...
+    return null;
+  }
+}</pre>
+          <p class="muted"><code>packages/games/checkers/src/index.ts</code></p>
+        </div>
+        <div class="card">
+          <h3>Mierzalna bramka</h3>
+<pre>$ git diff HEAD~1 -- packages/engine/
+
+(0 linii)</pre>
+          <p>Dodanie warcabów dotknęło tylko:</p>
+          <ul>
+            <li><code>packages/games/checkers/</code> &mdash; nowy folder</li>
+            <li><code>apps/web/lib/games-registry.ts</code> &mdash; +2 linie</li>
+            <li><code>apps/web/lib/games-ui.ts</code> &mdash; nowy plik</li>
+            <li><code>next.config.mjs</code> &mdash; jedna pozycja w <code>transpilePackages</code></li>
+          </ul>
+          <p class="muted" style="margin-top: 2vh;">
+            Trzecia gra: ten sam wzór, ten sam diff.
+          </p>
+        </div>
+      </div>
     </section>
 
     <section class="slide" data-title="Vibe Coding">
@@ -402,7 +489,7 @@ docs/architecture/       ADR-y</pre>
 
   <div class="footer">
     <span>AI Generation w praktyce</span>
-    <span><span id="slide-counter">1</span> / <span id="slide-total">11</span></span>
+    <span><span id="slide-counter">1</span> / <span id="slide-total">13</span></span>
   </div>
 
   <div class="nav" role="navigation" aria-label="Nawigacja slajdami">

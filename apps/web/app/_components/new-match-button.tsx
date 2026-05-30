@@ -43,12 +43,12 @@ export function NewMatchButton({ gameId }: Props) {
         type="button"
         onClick={startMatch}
         disabled={busy}
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+        className="btn-accent w-fit"
       >
-        {busy ? "Tworzenie..." : "Nowy mecz"}
+        {busy ? "Tworzenie…" : "Nowy mecz"}
       </button>
       {error !== null && (
-        <p className="text-sm text-red-400" role="alert">
+        <p className="text-sm" style={{ color: "var(--danger)" }} role="alert">
           {error}
         </p>
       )}

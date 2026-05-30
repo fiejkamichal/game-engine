@@ -1,24 +1,695 @@
 @import "tailwindcss";
 
-:root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --accent: #4f8cff;
+/* =========================================================================
+   Design system ported from presentation/index.html.
+   Single source of truth for both the slide deck and the live game UI:
+   same tokens, same backgrounds, same components, same dark/light themes.
+   ========================================================================= */
+
+:root,
+[data-theme="dark"] {
+  /* Tło */
+  --bg-base: #08090f;
+  --grid-dot: rgba(255, 255, 255, 0.035);
+  --orb-1: rgba(110, 168, 255, 0.18);
+  --orb-2: rgba(179, 136, 255, 0.16);
+  --orb-3: rgba(64, 212, 200, 0.08);
+
+  /* Powierzchnie / karty */
+  --panel: rgba(20, 24, 36, 0.65);
+  --panel-strong: rgba(28, 32, 48, 0.85);
+  --panel-code: rgba(8, 10, 18, 0.7);
+  --card-bg-top: rgba(28, 32, 48, 0.78);
+  --card-bg-bot: rgba(18, 22, 34, 0.65);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+
+  /* Tekst */
+  --fg: #ffffff;
+  --fg-2: #dde2ee;
+  --fg-3: #a8b0c3;
+  --muted: #8b94ad;
+
+  /* Akcenty */
+  --accent: #7eb0ff;
+  --accent-2: #c19bff;
+  --accent-3: #5cdcd0;
+  --accent-glow: rgba(126, 176, 255, 0.55);
+  --accent-glow-2: rgba(193, 155, 255, 0.45);
+
+  --title-grad-from: #ffffff;
+  --title-grad-to: #dde2ee;
+
+  /* Stany */
+  --danger: #ff8d8d;
+  --danger-glow: rgba(255, 141, 141, 0.45);
+
+  /* Code chips */
+  --code-bg: rgba(126, 176, 255, 0.16);
+  --code-border: rgba(126, 176, 255, 0.3);
+
+  /* Plansza — różnica musi być wyraźna w obu motywach.
+     "dark"/"light" to nazwy pól szachownicy, nie nazwy motywu. */
+  --board-dark: rgba(0, 0, 0, 0.55);
+  --board-light: rgba(255, 255, 255, 0.07);
+  --board-dark-hover: rgba(0, 0, 0, 0.45);
+  --board-light-hover: rgba(255, 255, 255, 0.12);
+
+  /* Etc */
+  --shadow-strong: rgba(0, 0, 0, 0.6);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  /* Tło — kremowo-perłowe */
+  --bg-base: #f4f5fa;
+  --grid-dot: rgba(20, 24, 40, 0.045);
+  --orb-1: rgba(91, 124, 220, 0.22);
+  --orb-2: rgba(157, 105, 230, 0.2);
+  --orb-3: rgba(28, 168, 158, 0.14);
+
+  /* Powierzchnie / karty */
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-strong: rgba(255, 255, 255, 0.92);
+  --panel-code: rgba(245, 246, 252, 0.92);
+  --card-bg-top: rgba(255, 255, 255, 0.88);
+  --card-bg-bot: rgba(248, 249, 254, 0.78);
+  --border: rgba(20, 24, 40, 0.1);
+  --border-strong: rgba(20, 24, 40, 0.22);
+
+  /* Tekst */
+  --fg: #0d1020;
+  --fg-2: #2a3148;
+  --fg-3: #4b5475;
+  --muted: #6b7491;
+
+  /* Akcenty — ciemniejsze pod jasne tło */
+  --accent: #2e63d6;
+  --accent-2: #7c44d8;
+  --accent-3: #0aa39a;
+  --accent-glow: rgba(46, 99, 214, 0.32);
+  --accent-glow-2: rgba(124, 68, 216, 0.28);
+
+  --title-grad-from: #0d1020;
+  --title-grad-to: #2a3148;
+
+  /* Stany */
+  --danger: #cc3838;
+  --danger-glow: rgba(204, 56, 56, 0.3);
+
+  /* Code chips */
+  --code-bg: rgba(46, 99, 214, 0.1);
+  --code-border: rgba(46, 99, 214, 0.24);
+
+  /* Plansza */
+  --board-dark: rgba(20, 24, 40, 0.18);
+  --board-light: rgba(255, 255, 255, 0.85);
+  --board-dark-hover: rgba(20, 24, 40, 0.26);
+  --board-light-hover: rgba(255, 255, 255, 1);
+
+  /* Etc */
+  --shadow-strong: rgba(20, 24, 40, 0.22);
+}
+
+/* Wystaw tokeny prezentacji jako utility Tailwinda v4 (np. bg-panel,
+   text-fg, border-app, text-accent). Tokeny pozostają reaktywne na
+   data-theme, bo wartości to var(...) — Tailwind sam nie zna motywów,
+   ale kaskada CSS variables tak. */
+@theme inline {
+  --color-bg: var(--bg-base);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-muted: var(--muted);
+  --color-panel: var(--panel);
+  --color-panel-strong: var(--panel-strong);
+  --color-panel-code: var(--panel-code);
+  --color-border-app: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+  --color-danger: var(--danger);
+
+  --font-sans:
+    var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular,
+    Menlo, Consolas, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html,
 body {
-  background: var(--background);
-  color: var(--foreground);
+  color: var(--fg);
+  background-color: var(--bg-base);
+  font-family:
+    var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
+  position: relative;
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+/* Statyczna siatka kropek w tle — ten sam wzór co prezentacja. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    var(--grid-dot) 1px,
+    transparent 0
+  );
+  background-size: 32px 32px;
+  mask-image: radial-gradient(
+    ellipse 90% 80% at 50% 50%,
+    black 30%,
+    transparent 75%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 90% 80% at 50% 50%,
+    black 30%,
+    transparent 75%
+  );
+  z-index: 0;
+}
+
+/* Trzy dryfujące orby — identycznie jak w prezentacji. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -5%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 45vmin at 18% 25%, var(--orb-1), transparent 55%),
+    radial-gradient(circle 38vmin at 82% 75%, var(--orb-2), transparent 55%),
+    radial-gradient(circle 32vmin at 50% 50%, var(--orb-3), transparent 60%);
+  animation: orbDrift 32s ease-in-out infinite alternate;
+  z-index: 0;
+  will-change: transform, opacity;
+}
+
+@keyframes orbDrift {
+  0% {
+    transform: translate(-2%, 1%) scale(1) rotate(0deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(0%, -1%) scale(1.06) rotate(1deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(2%, -2%) scale(1.1) rotate(2deg);
+    opacity: 0.95;
+  }
+}
+
+/* Treść strony siedzi nad tłem. */
+#app-root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Typografia ===== */
+
+/* Skala prezentacji jest pod rzutnik (clamp do ~7.8rem dla h1). Aplikacja
+   w przeglądarce dostaje wersję ~2x mniejszą — ten sam look i feel, ale
+   nagłówki nie zjadają całego ekranu. */
+h1 {
+  font-size: clamp(1.875rem, 3.5vw, 3.25rem);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--fg);
+  background: linear-gradient(
+    180deg,
+    var(--title-grad-from) 0%,
+    var(--title-grad-to) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  font-size: clamp(1.375rem, 2.4vw, 2.25rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  margin-bottom: 1rem;
+  color: var(--fg);
+  background: linear-gradient(
+    180deg,
+    var(--title-grad-from) 0%,
+    var(--title-grad-to) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h3 {
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  line-height: 1.3;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--fg);
+  letter-spacing: -0.005em;
+}
+
+p,
+li {
+  font-size: clamp(0.9rem, 1vw, 1.05rem);
+  line-height: 1.55;
+  color: var(--fg-2);
+}
+
+.lead {
+  color: var(--fg);
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+em {
+  color: var(--fg);
+  font-style: italic;
+}
+strong {
+  color: var(--fg);
+}
+
+code {
   font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace,
+    SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  padding: 0.12em 0.42em;
+  border-radius: 0.35em;
+  font-size: 0.9em;
+  color: var(--fg);
+  font-weight: 500;
+}
+
+pre {
+  position: relative;
+  background: var(--panel-code);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.4rem 1.6rem 1.4rem 2rem;
+  font-family:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: clamp(0.85rem, 1.1vw, 1.35rem);
+  line-height: 1.65;
+  margin-top: 1.5rem;
+  color: var(--fg);
+  overflow: auto;
+  backdrop-filter: blur(8px);
+}
+pre::before {
+  content: "";
+  position: absolute;
+  top: 0.6em;
+  bottom: 0.6em;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Listy w stylu prezentacji — myślnik-akcent zamiast bulleta.
+   Działa tylko, kiedy lista dostanie klasę `bullets`, żeby nie psuć
+   list utility (np. historii ruchów). */
+.bullets {
+  list-style: none;
+  padding-left: 0;
+}
+.bullets li {
+  position: relative;
+  padding-left: 1.8em;
+  margin-bottom: 1.4vh;
+}
+.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 0.8em;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 2px;
+  box-shadow: 0 0 6px var(--accent-glow);
+  transition:
+    width 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out);
+}
+.bullets li:hover::before {
+  width: 1.2em;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* ===== Eyebrow (gradientowy uppercase label) ===== */
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  width: fit-content;
+  color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    var(--accent-2) 70%,
+    var(--accent-3)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: clamp(0.75rem, 0.9vw, 1.3rem);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.eyebrow::before {
+  content: "\2192";
+  font-size: 1.25em;
+  line-height: 1;
+  font-weight: 800;
+  color: transparent;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+  animation: arrowNudge 2.4s ease-in-out infinite;
+}
+
+@keyframes arrowNudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(0.35em);
+  }
+}
+
+.accent {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+.accent-2 {
+  background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.muted {
+  color: var(--muted);
+}
+
+/* ===== Karta z animowanym conic-gradient bordererem ===== */
+
+@property --card-shimmer {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.card {
+  position: relative;
+  padding: 2rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
+  background: linear-gradient(
+    180deg,
+    var(--card-bg-top) 0%,
+    var(--card-bg-bot) 100%
+  );
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition:
+    transform 0.5s var(--ease-out),
+    border-color 0.5s var(--ease-out),
+    box-shadow 0.5s var(--ease-out);
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--card-shimmer),
+    transparent 0deg,
+    color-mix(in srgb, var(--accent) 75%, transparent) 60deg,
+    color-mix(in srgb, var(--accent-2) 60%, transparent) 130deg,
+    color-mix(in srgb, var(--accent-3) 50%, transparent) 200deg,
+    transparent 260deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.5s var(--ease-out);
+  animation: cardShimmer 9s linear infinite;
+}
+
+@keyframes cardShimmer {
+  to {
+    --card-shimmer: 360deg;
+  }
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    var(--accent-glow),
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease-out);
+  z-index: -1;
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-strong);
+  box-shadow:
+    0 30px 60px -20px var(--shadow-strong),
+    0 0 30px -5px var(--accent-glow);
+}
+.card:hover::before {
+  opacity: 1;
+}
+.card:hover::after {
+  opacity: 0.5;
+}
+
+/* Wariant statyczny — kontener planszy/historii ma nieinwazyjne karty
+   (bez shimmer i bez hover-lift), bo nie chcemy, żeby gra migotała pod
+   palcem gracza. */
+.card-flat {
+  position: relative;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
+  background: linear-gradient(
+    180deg,
+    var(--card-bg-top) 0%,
+    var(--card-bg-bot) 100%
+  );
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+}
+
+.card.bad::before {
+  background: conic-gradient(
+    from var(--card-shimmer),
+    transparent 0deg,
+    color-mix(in srgb, var(--danger) 70%, transparent) 60deg,
+    color-mix(in srgb, var(--danger) 55%, transparent) 130deg,
+    color-mix(in srgb, var(--danger) 40%, transparent) 200deg,
+    transparent 260deg
+  );
+}
+.card.bad .bullets li::before {
+  background: linear-gradient(90deg, var(--danger), var(--danger));
+  box-shadow: 0 0 6px var(--danger-glow);
+}
+.card.bad::after {
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    var(--danger-glow),
+    transparent 70%
+  );
+}
+.card.bad h3 {
+  color: var(--danger);
+}
+.card.bad:hover {
+  box-shadow:
+    0 30px 60px -20px var(--shadow-strong),
+    0 0 30px -5px var(--danger-glow);
+}
+
+/* ===== Przyciski / kontrolki ===== */
+
+.nav-btn,
+.icon-btn {
+  background: var(--panel-strong);
+  border: 1px solid var(--border);
+  color: var(--fg-2);
+  padding: 0.55rem 1rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-size: clamp(0.85rem, 1vw, 1.05rem);
+  line-height: 1;
+  font-family: inherit;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background 0.3s var(--ease-out),
+    color 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out),
+    transform 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out);
+}
+.nav-btn:hover,
+.icon-btn:hover {
+  color: var(--fg);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px -8px var(--accent-glow);
+}
+.nav-btn:disabled,
+.icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.nav-btn:focus-visible,
+.icon-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.icon-btn {
+  width: 2.6em;
+  height: 2.6em;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.9rem, 1.05vw, 1.3rem);
+}
+
+/* Przycisk-akcent (call-to-action: „Nowy mecz") — gradient akcentów,
+   nie samo szare panel-strong. */
+.btn-accent {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 0.7rem 1.25rem;
+  border-radius: 0.7rem;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #ffffff;
+  font-weight: 600;
+  font-size: clamp(0.9rem, 1.05vw, 1.1rem);
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow:
+    0 10px 30px -12px var(--accent-glow),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+  transition:
+    transform 0.25s var(--ease-out),
+    box-shadow 0.25s var(--ease-out),
+    filter 0.25s var(--ease-out);
+}
+.btn-accent:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow:
+    0 14px 36px -12px var(--accent-glow),
+    0 0 24px -6px var(--accent-glow-2),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.btn-accent:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  filter: grayscale(0.2);
+  box-shadow: none;
+}
+.btn-accent:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ===== Toolbar (theme toggle) — ten sam slot co w prezentacji ===== */
+
+.toolbar {
+  position: fixed;
+  bottom: 2.2vh;
+  right: 2vw;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 12;
+}
+
+/* ===== Reduced motion — wyciszamy wszystkie ozdobne animacje ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  body::after,
+  .card::before,
+  .card.bad::before,
+  .eyebrow::before {
+    animation: none !important;
+    transition: opacity 0.2s ease !important;
+    transform: none !important;
+    filter: none !important;
+  }
 }

@@ -33,28 +33,28 @@ export default async function MatchPage({ params }: Props) {
   const game = getGame(state.gameId);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-8 px-6 py-12">
-      <header className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
-            {game?.displayName ?? state.gameId}
-          </p>
-          <h1 className="font-mono text-lg text-neutral-200">{state.matchId}</h1>
+    <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-8 px-[max(1.5rem,6vw)] py-[8vh]">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <p className="eyebrow">{game?.displayName ?? state.gameId}</p>
+          <h2 className="!mb-0">
+            Mecz <span className="accent">{state.matchId}</span>
+          </h2>
         </div>
-        <Link
-          href="/"
-          className="text-sm text-neutral-400 underline-offset-4 hover:underline"
-        >
+        <Link href="/" className="nav-btn">
           ← Lista gier
         </Link>
       </header>
 
       {game === null ? (
-        <div className="rounded-lg border border-red-900 bg-red-950/40 p-6 text-sm text-red-200">
-          Mecz wskazuje na grę <code>{state.gameId}</code>, której nie ma w
-          rejestrze (<code>apps/web/lib/games-registry.ts</code>). Sprawdź, czy
-          paczka <code>packages/games/{state.gameId}/</code> jest
-          zarejestrowana.
+        <div className="card bad">
+          <h3>Brak gry w rejestrze</h3>
+          <p>
+            Mecz wskazuje na grę <code>{state.gameId}</code>, której nie ma w
+            rejestrze (<code>apps/web/lib/games-registry.ts</code>). Sprawdź,
+            czy paczka <code>packages/games/{state.gameId}/</code> jest
+            zarejestrowana.
+          </p>
         </div>
       ) : (
         <MatchBoard initialState={state} />

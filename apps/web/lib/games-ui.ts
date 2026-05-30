@@ -63,11 +63,14 @@ const ticTacToeUi: GameUiHelpers = {
   renderPiece(piece) {
     return {
       label: piece.kind.toUpperCase(),
-      className: piece.owner === "white" ? "text-sky-300" : "text-rose-300",
+      className:
+        piece.owner === "white"
+          ? "text-[var(--accent)]"
+          : "text-[var(--accent-2)]",
     };
   },
   boardCellClass(_cell) {
-    return "bg-neutral-800 hover:bg-neutral-700";
+    return "bg-[var(--board-dark)] hover:bg-[var(--board-dark-hover)]";
   },
 };
 
@@ -116,14 +119,16 @@ const checkersUi: GameUiHelpers = {
   renderPiece(piece) {
     const label = piece.kind === "king" ? "♛" : "●";
     const className =
-      piece.owner === "white" ? "text-amber-100" : "text-rose-400";
+      piece.owner === "white"
+        ? "text-[var(--accent)] drop-shadow-[0_0_10px_var(--accent-glow)]"
+        : "text-[var(--accent-2)] drop-shadow-[0_0_10px_var(--accent-glow-2)]";
     return { label, className };
   },
   boardCellClass(cell) {
     const isDark = (cell.row + cell.col) % 2 === 1;
     return isDark
-      ? "bg-neutral-900 hover:bg-neutral-800"
-      : "bg-neutral-700/40";
+      ? "bg-[var(--board-dark)] hover:bg-[var(--board-dark-hover)]"
+      : "bg-[var(--board-light)] hover:bg-[var(--board-light-hover)]";
   },
 };
 
@@ -136,10 +141,10 @@ const fallbackUi: GameUiHelpers = {
     return { status: "ready", move };
   },
   renderPiece(piece) {
-    return { label: piece.kind, className: "text-neutral-100" };
+    return { label: piece.kind, className: "text-[var(--fg)]" };
   },
   boardCellClass(_cell) {
-    return "bg-neutral-800 hover:bg-neutral-700";
+    return "bg-[var(--board-dark)] hover:bg-[var(--board-dark-hover)]";
   },
 };
 

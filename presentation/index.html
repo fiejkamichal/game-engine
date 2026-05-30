@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,35 +8,154 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg: #0b0d12;
-      --panel: #11141d;
-      --panel-2: #1a1e2b;
-      --border: #222736;
-      --fg: #e7e9ee;
-      --fg-2: #c8ccd6;
-      --muted: #7e8597;
-      --accent: #4f8cff;
-      --accent-2: #8b5cf6;
-      --danger: #f87171;
+    :root, [data-theme="dark"] {
+      /* Tło */
+      --bg-base: #08090f;
+      --grid-dot: rgba(255, 255, 255, 0.035);
+      --orb-1: rgba(110, 168, 255, 0.18);
+      --orb-2: rgba(179, 136, 255, 0.16);
+      --orb-3: rgba(64, 212, 200, 0.08);
+
+      /* Powierzchnie / karty */
+      --panel: rgba(20, 24, 36, 0.65);
+      --panel-strong: rgba(28, 32, 48, 0.85);
+      --panel-code: rgba(8, 10, 18, 0.7);
+      --card-bg-top: rgba(28, 32, 48, 0.78);
+      --card-bg-bot: rgba(18, 22, 34, 0.65);
+      --border: rgba(255, 255, 255, 0.10);
+      --border-strong: rgba(255, 255, 255, 0.20);
+
+      /* Tekst — podbite o ~6-8% jasności pod rzutnik */
+      --fg: #ffffff;
+      --fg-2: #dde2ee;
+      --fg-3: #a8b0c3;
+      --muted: #8b94ad;
+
+      /* Akcenty — czytelne, gradient text z odpowiednim L* */
+      --accent: #7eb0ff;
+      --accent-2: #c19bff;
+      --accent-3: #5cdcd0;
+      --accent-glow: rgba(126, 176, 255, 0.55);
+      --accent-glow-2: rgba(193, 155, 255, 0.45);
+
+      --title-grad-from: #ffffff;
+      --title-grad-to: #dde2ee;
+
+      /* Stany */
+      --danger: #ff8d8d;
+      --danger-glow: rgba(255, 141, 141, 0.45);
+
+      /* Code chips */
+      --code-bg: rgba(126, 176, 255, 0.16);
+      --code-border: rgba(126, 176, 255, 0.30);
+
+      /* Etc */
+      --shadow-strong: rgba(0, 0, 0, 0.6);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] {
+      /* Tło — kremowo-perłowe, nie czysto białe, żeby orby się ładnie wlewały */
+      --bg-base: #f4f5fa;
+      --grid-dot: rgba(20, 24, 40, 0.045);
+      --orb-1: rgba(91, 124, 220, 0.22);
+      --orb-2: rgba(157, 105, 230, 0.20);
+      --orb-3: rgba(28, 168, 158, 0.14);
+
+      /* Powierzchnie / karty */
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-strong: rgba(255, 255, 255, 0.92);
+      --panel-code: rgba(245, 246, 252, 0.92);
+      --card-bg-top: rgba(255, 255, 255, 0.88);
+      --card-bg-bot: rgba(248, 249, 254, 0.78);
+      --border: rgba(20, 24, 40, 0.10);
+      --border-strong: rgba(20, 24, 40, 0.22);
+
+      /* Tekst — wysokie kontrasty pod rzutnik */
+      --fg: #0d1020;
+      --fg-2: #2a3148;
+      --fg-3: #4b5475;
+      --muted: #6b7491;
+
+      /* Akcenty — ciemniejsze pod jasne tło dla kontrastu */
+      --accent: #2e63d6;
+      --accent-2: #7c44d8;
+      --accent-3: #0aa39a;
+      --accent-glow: rgba(46, 99, 214, 0.32);
+      --accent-glow-2: rgba(124, 68, 216, 0.28);
+
+      --title-grad-from: #0d1020;
+      --title-grad-to: #2a3148;
+
+      /* Stany */
+      --danger: #cc3838;
+      --danger-glow: rgba(204, 56, 56, 0.30);
+
+      /* Code chips */
+      --code-bg: rgba(46, 99, 214, 0.10);
+      --code-border: rgba(46, 99, 214, 0.24);
+
+      /* Etc */
+      --shadow-strong: rgba(20, 24, 40, 0.22);
     }
 
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: var(--bg);
       color: var(--fg);
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+      background-color: var(--bg-base);
+    }
+
+    body {
+      position: relative;
+      background: var(--bg-base);
+    }
+
+    /* Statyczny noise grid w tle */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 30%, transparent 75%);
+      z-index: 0;
+    }
+
+    /* Animowane "orby" — trzy radialne glow, lekko dryfują przez ekran */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -5%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle 45vmin at 18% 25%, var(--orb-1), transparent 55%),
+        radial-gradient(circle 38vmin at 82% 75%, var(--orb-2), transparent 55%),
+        radial-gradient(circle 32vmin at 50% 50%, var(--orb-3), transparent 60%);
+      animation: orbDrift 32s ease-in-out infinite alternate;
+      z-index: 0;
+      will-change: transform, opacity;
+    }
+
+    @keyframes orbDrift {
+      0%   { transform: translate(-2%, 1%) scale(1)    rotate(0deg); opacity: 0.9; }
+      50%  { transform: translate(0%,  -1%) scale(1.06) rotate(1deg); opacity: 1; }
+      100% { transform: translate(2%, -2%) scale(1.10) rotate(2deg); opacity: 0.95; }
     }
 
     .deck {
       position: relative;
       width: 100vw;
       height: 100vh;
+      z-index: 1;
     }
 
     .slide {
@@ -49,168 +168,656 @@
     }
     .slide.active { display: flex; }
 
+    @keyframes slideTitleIn {
+      from { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+      to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+    }
+
+    .slide.active > .eyebrow,
+    .slide.active > .layer-badge {
+      animation: slideTitleIn 0.7s var(--ease-out) both;
+    }
+    .slide.active > .eyebrow { animation-delay: 0s; }
+    .slide.active > .layer-badge { animation-delay: 0.12s; }
+
+    .slide[data-no-fragments].active > * {
+      animation: slideTitleIn 0.75s var(--ease-out) both;
+    }
+    .slide[data-no-fragments].active > *:nth-child(1) { animation-delay: 0s; }
+    .slide[data-no-fragments].active > *:nth-child(2) { animation-delay: 0.10s; }
+    .slide[data-no-fragments].active > *:nth-child(3) { animation-delay: 0.20s; }
+    .slide[data-no-fragments].active > *:nth-child(4) { animation-delay: 0.30s; }
+    .slide[data-no-fragments].active > *:nth-child(5) { animation-delay: 0.40s; }
+    .slide[data-no-fragments].active > *:nth-child(n+6) { animation-delay: 0.50s; }
+
     .eyebrow {
-      color: var(--muted);
-      font-size: 0.85rem;
-      letter-spacing: 0.3em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6em;
+      width: fit-content;
+      color: transparent;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2) 70%, var(--accent-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      font-size: clamp(0.75rem, 0.9vw, 1.3rem);
+      font-weight: 600;
+      letter-spacing: 0.32em;
       text-transform: uppercase;
-      margin-bottom: 2.5vh;
+      margin-bottom: 2.8vh;
+      position: relative;
+    }
+    .eyebrow::before {
+      content: "\2192"; /* → */
+      font-size: 1.25em;
+      line-height: 1;
+      font-weight: 800;
+      color: transparent;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 10px var(--accent-glow));
+      animation: arrowNudge 2.4s ease-in-out infinite;
+    }
+
+    @keyframes arrowNudge {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(0.35em); }
     }
 
     h1 {
-      font-size: clamp(2.5rem, 6vw, 5rem);
-      line-height: 1.05;
+      font-size: clamp(2.4rem, 6vw, 7.8rem);
+      line-height: 1.04;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
+      color: var(--fg);
+      background: linear-gradient(180deg, var(--title-grad-from) 0%, var(--title-grad-to) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     h2 {
-      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-size: clamp(1.75rem, 4.2vw, 4.8rem);
       line-height: 1.1;
       font-weight: 700;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.018em;
       margin-bottom: 3.5vh;
+      color: var(--fg);
+      background: linear-gradient(180deg, var(--title-grad-from) 0%, var(--title-grad-to) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     h3 {
-      font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+      font-size: clamp(1rem, 1.6vw, 2rem);
       line-height: 1.3;
       font-weight: 600;
       margin-bottom: 1.5vh;
-      color: var(--accent);
+      color: var(--fg);
+      letter-spacing: -0.005em;
     }
     p, li {
-      font-size: clamp(1rem, 1.4vw, 1.4rem);
+      font-size: clamp(0.95rem, 1.35vw, 1.75rem);
       line-height: 1.55;
       color: var(--fg-2);
     }
 
-    .lead { color: var(--fg); font-size: clamp(1.1rem, 1.6vw, 1.6rem); }
+    .lead {
+      color: var(--fg);
+      font-size: clamp(1.1rem, 1.75vw, 2.25rem);
+      line-height: 1.45;
+      font-weight: 400;
+    }
+
+    /* Slajd przerwy kawowej — wycentrowane, dużo oddechu, animowana filiżanka */
+    .slide.break-slide {
+      align-items: center;
+      text-align: center;
+    }
+    .slide.break-slide > .eyebrow,
+    .slide.break-slide > .lead,
+    .slide.break-slide > .muted {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .slide.break-slide > .eyebrow::before {
+      display: none; /* bez strzałki — slajd jest dosłownie "pauzą" */
+    }
+    .break-mark {
+      position: relative;
+      width: clamp(12rem, 22vmin, 22rem);
+      height: clamp(12rem, 22vmin, 22rem);
+      margin: 2vh auto 3vh;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--panel-strong);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border-strong);
+      box-shadow:
+        inset 0 0 50px var(--accent-glow),
+        0 30px 80px -20px var(--shadow-strong);
+    }
+    .break-mark::before {
+      content: "";
+      position: absolute;
+      inset: -14px;
+      border-radius: inherit;
+      background: conic-gradient(from 0deg,
+        var(--accent),
+        var(--accent-2),
+        var(--accent-3),
+        var(--accent-2),
+        var(--accent));
+      z-index: -1;
+      filter: blur(18px);
+      opacity: 0.55;
+      animation: badgeHalo 14s linear infinite;
+    }
+    .break-cup {
+      font-size: clamp(6rem, 12vmin, 12rem);
+      line-height: 1;
+      filter: drop-shadow(0 6px 16px var(--shadow-strong));
+      animation: cupBob 4.2s ease-in-out infinite;
+    }
+    @keyframes cupBob {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50%      { transform: translateY(-6px) rotate(1deg); }
+    }
+    .break-title {
+      font-size: clamp(2.5rem, 7.5vw, 8.5rem) !important;
+    }
+    .break-lead {
+      margin-top: 4vh;
+      max-width: 50ch;
+    }
+    .break-hint {
+      margin-top: 6vh;
+      max-width: 56ch;
+    }
+
+    /* Linia metadanych pod lead na slajdzie tytułowym (autor • data) */
+    .byline {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.2em;
+      font-size: clamp(0.9rem, 1.2vw, 1.5rem);
+      color: var(--fg-2);
+      letter-spacing: 0.04em;
+      width: fit-content;
+    }
+    .byline-sep {
+      display: inline-block;
+      width: 2.5em;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    em { color: var(--fg); font-style: italic; }
+    strong { color: var(--fg); }
 
     ul { list-style: none; padding-left: 0; }
     ul li {
       position: relative;
-      padding-left: 1.6em;
-      margin-bottom: 1.2vh;
+      padding-left: 1.8em;
+      margin-bottom: 1.4vh;
     }
     ul li::before {
-      content: "→";
+      content: "";
       position: absolute;
       left: 0;
-      color: var(--accent);
-      font-weight: 700;
+      top: 0.7em;
+      width: 0.8em;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 2px;
+      box-shadow: 0 0 6px var(--accent-glow);
+      transition: width 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
     }
+    ul li:hover::before { width: 1.2em; box-shadow: 0 0 10px var(--accent-glow); }
 
     .columns {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 3vw;
+      gap: 2.6vw;
       align-items: stretch;
     }
     .columns-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 2.5vw;
+      gap: 2.2vw;
       align-items: stretch;
     }
 
     .card {
-      padding: 3.5vh 2.5vw;
+      position: relative;
+      padding: 3.5vh 2.4vw;
       border: 1px solid var(--border);
-      border-radius: 0.9rem;
-      background: var(--panel);
+      border-radius: 1.1rem;
+      background:
+        linear-gradient(180deg, var(--card-bg-top) 0%, var(--card-bg-bot) 100%);
+      backdrop-filter: blur(14px) saturate(120%);
+      -webkit-backdrop-filter: blur(14px) saturate(120%);
       display: flex;
       flex-direction: column;
       gap: 1vh;
+      transition:
+        transform 0.5s var(--ease-out),
+        border-color 0.5s var(--ease-out),
+        box-shadow 0.5s var(--ease-out);
+      overflow: hidden;
+    }
+    /* @property pozwala animować kąt conic-gradientu na border kart */
+    @property --card-shimmer {
+      syntax: "<angle>";
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: conic-gradient(from var(--card-shimmer),
+        transparent 0deg,
+        color-mix(in srgb, var(--accent) 75%, transparent) 60deg,
+        color-mix(in srgb, var(--accent-2) 60%, transparent) 130deg,
+        color-mix(in srgb, var(--accent-3) 50%, transparent) 200deg,
+        transparent 260deg);
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0.85;
+      transition: opacity 0.5s var(--ease-out);
+      animation: cardShimmer 9s linear infinite;
+    }
+
+    @keyframes cardShimmer {
+      to { --card-shimmer: 360deg; }
+    }
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, var(--accent-glow), transparent 70%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s var(--ease-out);
+      z-index: -1;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-strong);
+      box-shadow:
+        0 30px 60px -20px var(--shadow-strong),
+        0 0 30px -5px var(--accent-glow);
+    }
+    .card:hover::before { opacity: 1; }
+    .card:hover::after { opacity: 0.5; }
+
+    .card.bad::before {
+      background: conic-gradient(from var(--card-shimmer),
+        transparent 0deg,
+        color-mix(in srgb, var(--danger) 70%, transparent) 60deg,
+        color-mix(in srgb, var(--danger) 55%, transparent) 130deg,
+        color-mix(in srgb, var(--danger) 40%, transparent) 200deg,
+        transparent 260deg);
+    }
+    .card.bad ul li::before {
+      background: linear-gradient(90deg, var(--danger), var(--danger));
+      box-shadow: 0 0 6px var(--danger-glow);
+    }
+    .card.bad::after {
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, var(--danger-glow), transparent 70%);
     }
     .card.bad h3 { color: var(--danger); }
-    .card.bad ul li::before { color: var(--danger); }
+    .card.bad:hover {
+      box-shadow:
+        0 30px 60px -20px var(--shadow-strong),
+        0 0 30px -5px var(--danger-glow);
+    }
 
-    .accent { color: var(--accent); }
-    .accent-2 { color: var(--accent-2); }
+    .accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+    .accent-2 {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .muted { color: var(--muted); }
 
     code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      background: var(--panel-2);
-      padding: 0.15em 0.45em;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 0.12em 0.42em;
       border-radius: 0.35em;
-      font-size: 0.92em;
+      font-size: 0.9em;
       color: var(--fg);
+      font-weight: 500;
     }
 
     pre {
-      background: var(--panel);
+      position: relative;
+      background: var(--panel-code);
       border: 1px solid var(--border);
-      border-radius: 0.6rem;
-      padding: 2vh 1.8vw;
-      font-family: ui-monospace, monospace;
-      font-size: clamp(0.85rem, 1.05vw, 1.05rem);
-      line-height: 1.6;
+      border-radius: 0.75rem;
+      padding: 2vh 1.8vw 2vh 2.2vw;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: clamp(0.85rem, 1.1vw, 1.35rem);
+      line-height: 1.65;
       margin-top: 2vh;
-      color: var(--fg-2);
+      color: var(--fg);
       overflow: auto;
+      backdrop-filter: blur(8px);
+    }
+    pre::before {
+      content: "";
+      position: absolute;
+      top: 0.6em;
+      bottom: 0.6em;
+      left: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      border-radius: 0 3px 3px 0;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+      color: inherit;
     }
 
     .footer {
       position: fixed;
-      bottom: 2vh;
+      bottom: 2.4vh;
       left: 9vw;
       right: 9vw;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: #555a6d;
-      font-size: 0.8rem;
-      letter-spacing: 0.18em;
+      color: var(--fg-3);
+      font-size: clamp(0.75rem, 0.9vw, 1.05rem);
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       pointer-events: none;
+      z-index: 5;
+    }
+    .footer span:last-child {
+      font-variant-numeric: tabular-nums;
     }
 
     .nav {
       position: fixed;
-      bottom: 2vh;
+      bottom: 2.2vh;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 0.4rem;
+      gap: 0.5rem;
       z-index: 10;
     }
-    .nav button {
-      background: var(--panel-2);
+    .nav button, .icon-btn {
+      background: var(--panel-strong);
       border: 1px solid var(--border);
       color: var(--fg-2);
-      padding: 0.5rem 0.9rem;
-      border-radius: 0.45rem;
+      padding: 0.55rem 1rem;
+      border-radius: 0.6rem;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: clamp(0.85rem, 1vw, 1.25rem);
       line-height: 1;
       font-family: inherit;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition:
+        background 0.3s var(--ease-out),
+        color 0.3s var(--ease-out),
+        border-color 0.3s var(--ease-out),
+        transform 0.3s var(--ease-out),
+        box-shadow 0.3s var(--ease-out);
     }
-    .nav button:hover { background: #232838; color: var(--fg); }
-    .nav button:disabled { opacity: 0.35; cursor: default; }
-    .nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav button:hover, .icon-btn:hover {
+      color: var(--fg);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px -8px var(--accent-glow);
+    }
+    .nav button:disabled {
+      opacity: 0.3;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+    .nav button:focus-visible, .icon-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    /* Toolbar w prawym dolnym rogu: theme + menu (lista slajdów) */
+    .toolbar {
+      position: fixed;
+      bottom: 2.2vh;
+      right: 2vw;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 12;
+    }
+    .icon-btn {
+      width: 2.6em;
+      height: 2.6em;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(0.9rem, 1.05vw, 1.3rem);
+    }
+
+    /* Dialog z listą slajdów */
+    .slide-menu {
+      position: fixed;
+      inset: 0;
+      background: color-mix(in srgb, var(--bg-base) 85%, transparent);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 6vh 8vw;
+    }
+    .slide-menu.open { display: flex; }
+    .slide-menu__panel {
+      width: 100%;
+      max-width: 70rem;
+      max-height: 86vh;
+      overflow-y: auto;
+      background: var(--panel-strong);
+      border: 1px solid var(--border-strong);
+      border-radius: 1.25rem;
+      padding: 3.5vh 3vw;
+      box-shadow: 0 50px 100px -30px var(--shadow-strong);
+    }
+    .slide-menu__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 2.5vh;
+      gap: 2rem;
+    }
+    .slide-menu__title {
+      font-size: clamp(1.25rem, 1.75vw, 2.1rem);
+      font-weight: 700;
+      color: var(--fg);
+      letter-spacing: -0.01em;
+    }
+    .slide-menu__hint {
+      color: var(--fg-3);
+      font-size: clamp(0.75rem, 0.9vw, 1rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .slide-menu__list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+      gap: 0.8rem;
+      list-style: none;
+    }
+    .slide-menu__list li { padding: 0; margin: 0; }
+    .slide-menu__list li::before { display: none; }
+    .slide-menu__item {
+      width: 100%;
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--fg-2);
+      padding: 0.8rem 1rem;
+      border-radius: 0.7rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: clamp(0.85rem, 1vw, 1.15rem);
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      transition: all 0.25s var(--ease-out);
+    }
+    .slide-menu__item:hover {
+      background: var(--panel-strong);
+      color: var(--fg);
+      border-color: var(--border-strong);
+      transform: translateX(3px);
+    }
+    .slide-menu__item.active {
+      color: var(--fg);
+      border-color: transparent;
+      background: linear-gradient(135deg,
+        color-mix(in srgb, var(--accent) 25%, transparent),
+        color-mix(in srgb, var(--accent-2) 15%, transparent));
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+    .slide-menu__num {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.85em;
+      color: var(--accent);
+      font-weight: 700;
+      min-width: 2.2em;
+      letter-spacing: -0.04em;
+    }
+    .slide-menu__item.active .slide-menu__num { color: var(--fg); }
+    .slide-menu__item-title { flex: 1; }
 
     .progress {
       position: fixed;
       top: 0;
       left: 0;
       height: 3px;
-      background: var(--accent);
-      transition: width 0.25s ease;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 60%, var(--accent-3));
+      box-shadow:
+        0 0 12px var(--accent-glow),
+        0 0 24px var(--accent-glow-2);
+      transition: width 0.4s var(--ease-out);
       z-index: 11;
+      border-radius: 0 3px 3px 0;
     }
 
-    .pill {
-      display: inline-block;
-      padding: 0.3rem 0.8rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-right: 0.5rem;
+    .fragment {
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(8px);
+      transition:
+        opacity 0.55s var(--ease-out),
+        transform 0.55s var(--ease-out),
+        filter 0.55s var(--ease-out);
     }
-    .pill.on { color: var(--accent); border-color: var(--accent); }
+    .fragment.visible {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      transition-delay: calc(var(--frag-index, 0) * 0.07s);
+    }
+
+    .card.fragment {
+      transform: translateY(28px) scale(0.97);
+    }
+    .card.fragment.visible {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Numer warstwy (1-9) — duży badge w prawym górnym rogu, z animowanym
+       conic-gradient halo za nim. Wstrzykiwany przez JS dla slajdów z eyebrowem
+       zaczynającym się od "Warstwa N". */
+    .layer-badge {
+      position: absolute;
+      top: 5.5vh;
+      right: 6vw;
+      width: 9.5vmin;
+      height: 9.5vmin;
+      display: grid;
+      place-items: center;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 4.4vmin;
+      font-weight: 800;
+      color: var(--fg);
+      letter-spacing: -0.04em;
+      background: var(--panel-strong);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-strong);
+      border-radius: 50%;
+      z-index: 4;
+      text-shadow: 0 0 14px var(--accent-glow);
+      box-shadow:
+        inset 0 0 30px var(--accent-glow),
+        0 10px 40px -10px var(--shadow-strong);
+    }
+
+    .layer-badge::before {
+      content: "";
+      position: absolute;
+      inset: -7px;
+      border-radius: inherit;
+      background: conic-gradient(from 0deg,
+        var(--accent),
+        var(--accent-2),
+        var(--accent-3),
+        var(--accent-2),
+        var(--accent));
+      z-index: -1;
+      filter: blur(10px);
+      opacity: 0.55;
+      animation: badgeHalo 10s linear infinite;
+    }
+
+    @keyframes badgeHalo {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .slide.active > *,
+      .fragment,
+      body::after,
+      .card::before,
+      .card.bad::before,
+      .eyebrow::before,
+      .layer-badge::before {
+        animation: none !important;
+        transition: opacity 0.2s ease !important;
+        transform: none !important;
+        filter: none !important;
+      }
+    }
 
     @media (max-width: 900px) {
       .columns, .columns-3 { grid-template-columns: 1fr; }
@@ -222,12 +829,17 @@
 
   <main class="deck" id="deck">
 
-    <section class="slide active" data-title="Tytul">
+    <section class="slide active" data-title="Tytul" data-no-fragments>
       <p class="eyebrow">Warsztat • 1,5 h • Polski</p>
       <h1>AI Generation w praktyce<br><span class="accent">Od teorii do zastosowania</span></h1>
       <p class="lead" style="margin-top: 5vh; max-width: 50ch;">
         Systemy wieloagentowe, vibe coding, jeden kod &mdash; cztery role.
         Engine gier turowych jako pretekst do mówienia o&nbsp;architekturze AI.
+      </p>
+      <p class="byline" style="margin-top: 6vh;">
+        <span><strong class="accent">Michał Fiejka</strong></span>
+        <span class="byline-sep" aria-hidden="true"></span>
+        <span>31 maja 2026</span>
       </p>
     </section>
 
@@ -235,116 +847,217 @@
       <p class="eyebrow">Plan na 90 minut</p>
       <h2>Agenda</h2>
       <ul>
-        <li><strong>30&ndash;40 min &mdash; Teoria.</strong> Czym <em>są</em> i&nbsp;czym <em>nie są</em> systemy wieloagentowe AI. Orkiestracja, kontrakty, skille.</li>
-        <li><strong>40&ndash;50 min &mdash; Praktyka.</strong> Vibe coding na żywym repo. Dopinasz funkcję w&nbsp;~10 minut, używając darmowego copilota.</li>
-        <li><strong>10 min &mdash; Q&amp;A.</strong> Pytania, kierunki dalszej pracy, materiały.</li>
+        <li><strong>~45 min &mdash; Teoria.</strong> Czym <em>są</em> i&nbsp;czym <em>nie są</em> systemy wieloagentowe AI. Orkiestracja, kontrakty, skille.</li>
+        <li><strong>~7 min &mdash; Przerwa na kawę.</strong> Reset, rozprostowanie nóg, zalogowanie do copilota.</li>
+        <li><strong>~30 min &mdash; Praktyka.</strong> Vibe coding na żywym repo. Dopinasz funkcję w&nbsp;~10 minut, używając darmowego copilota.</li>
+        <li><strong>~8 min &mdash; Q&amp;A.</strong> Pytania, kierunki dalszej pracy, materiały.</li>
       </ul>
       <p class="muted" style="margin-top: 4vh;">Wymagania: laptop, internet, darmowe konto AI (np. ChatGPT).</p>
     </section>
 
-    <section class="slide" data-title="Krajobraz">
-      <p class="eyebrow">Sekcja 1 &mdash; Krajobraz</p>
-      <h2>Gdzie w&nbsp;tym wszystkim są agenci</h2>
-      <div class="columns-3">
-        <div class="card">
-          <h3>Prompt</h3>
-          <p>Pojedyncza instrukcja dla LLM. Bez stanu, bez pętli, bez narzędzi. Najmniejsza jednostka.</p>
-        </div>
-        <div class="card">
-          <h3>RAG</h3>
-          <p>Prompt wzbogacony danymi z&nbsp;zewnętrznej bazy. Tutaj &mdash; tylko jako kontrast, nie jest tematem warsztatu.</p>
-        </div>
-        <div class="card">
-          <h3>Agent</h3>
-          <p>Decyzyjna jednostka z&nbsp;rolą, celem i&nbsp;granicami. Pętla obserwacja&rarr;decyzja&rarr;akcja. Może <em>używać</em> RAG i&nbsp;skilli.</p>
-        </div>
-      </div>
-      <p class="muted" style="margin-top: 4vh;">Każde z&nbsp;tych narzędzi rozwiązuje inny problem. Mylenie ich kosztuje czas i&nbsp;pieniądze.</p>
+    <section class="slide" data-title="Vibe Coding">
+      <p class="eyebrow">Punkt wyjścia</p>
+      <h2>Vibe coding</h2>
+      <p class="lead" style="max-width: 60ch;">
+        Programowanie, w&nbsp;którym <em>opisujesz intencję</em>, a&nbsp;kod pisze maszyna.
+      </p>
+      <p style="margin-top: 4vh; max-width: 60ch;">
+        Brzmi prosto, dopóki nie spróbujesz. Bo żeby zrobić to dobrze &mdash; wiedzieć, co dać AI w&nbsp;kontekst,
+        gdzie postawić granice, kiedy podzielić zadanie &mdash; musisz znać warstwy, które są pod spodem.
+      </p>
+      <p class="muted" style="margin-top: 4vh;">
+        Przez następne ~25 minut zbudujemy je razem, od dołu do góry.
+      </p>
     </section>
 
-    <section class="slide" data-title="Czym jest agent">
-      <p class="eyebrow">Sekcja 2 &mdash; Definicja</p>
-      <h2>Czym <span class="accent">jest</span> agent &mdash; a&nbsp;czym <span style="color: var(--danger)">nie jest</span></h2>
+    <section class="slide" data-title="LLM">
+      <p class="eyebrow">Warstwa 1 &mdash; Model</p>
+      <h2>LLM &mdash; funkcja <span class="accent">tekst &rarr; tekst</span></h2>
       <div class="columns">
         <div class="card">
-          <h3>Agent JEST</h3>
+          <h3>Co robi</h3>
+          <p>Bierze tekst na wejściu. Zwraca tekst na wyjściu. Koniec.</p>
+        </div>
+        <div class="card">
+          <h3>Czego NIE robi</h3>
           <ul>
-            <li>Jednostką z&nbsp;rolą i&nbsp;misją</li>
-            <li>Pętlą decyzyjną (obserwuje, decyduje, działa)</li>
-            <li>Konsumentem narzędzi i&nbsp;skilli</li>
-            <li>Częścią systemu z&nbsp;jasnymi granicami</li>
+            <li>Nie pamięta nic między wywołaniami</li>
+            <li>Nie ma dostępu do plików, internetu, twojego edytora</li>
+            <li>Nie wie nawet, że gada z&nbsp;tobą &mdash; widzi tylko jeden tekst</li>
           </ul>
+        </div>
+      </div>
+      <p class="muted" style="margin-top: 4vh;">
+        To wszystko, co siedzi pod ChatGPT, Cursorem, Copilotem. Naprawdę.
+      </p>
+    </section>
+
+    <section class="slide" data-title="Prompt">
+      <p class="eyebrow">Warstwa 2 &mdash; Prompt + inferencja</p>
+      <h2>Jedno wywołanie = jeden tekst wejściowy</h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Co składa się na prompt</h3>
+          <ul>
+            <li><strong class="accent">system</strong> &mdash; &bdquo;jesteś asystentem programisty"</li>
+            <li><strong class="accent">history</strong> &mdash; poprzednie wymiany w&nbsp;tej rozmowie</li>
+            <li><strong class="accent">user</strong> &mdash; &bdquo;napisz funkcję X"</li>
+          </ul>
+          <p class="muted" style="margin-top: 1.5vh;">Wszystko sklejone w&nbsp;jeden tekst, do jednego wywołania = jedna <em>inferencja</em>.</p>
+        </div>
+        <div class="card">
+          <h3>Sztywne ograniczenie</h3>
+          <p><strong>Token window</strong> &mdash; kontekst ma twardy limit (np. 200k tokenów).</p>
+          <p class="muted" style="margin-top: 1.5vh;">
+            Co się nie zmieści &mdash; przepada. Stąd cały temat <em>zarządzania kontekstem</em> w&nbsp;warstwie wyżej.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Aplikacja-host">
+      <p class="eyebrow">Warstwa 3 &mdash; Aplikacja</p>
+      <h2>ChatGPT, Cursor, Copilot <span class="muted">to nie LLM-y</span> &mdash; to <span class="accent">hosty</span></h2>
+      <ul>
+        <li>Piszą za ciebie <strong>system prompt</strong> &mdash; nadają osobowość i&nbsp;reguły gry</li>
+        <li>Zarządzają <strong>kontekstem</strong> &mdash; kompakcja długich wątków, retrieval z&nbsp;plików, dobór fragmentów kodu</li>
+        <li>Dają <strong>UI</strong> &mdash; wątki, czat, edytor, terminal</li>
+        <li>Spinają <strong>narzędzia</strong> &mdash; o&nbsp;tym za chwilę</li>
+      </ul>
+      <p class="muted" style="margin-top: 4vh; max-width: 60ch;">
+        Ten sam LLM w&nbsp;ChatGPT i&nbsp;w&nbsp;Cursorze zachowuje się inaczej &mdash; bo aplikacje są różne.
+      </p>
+    </section>
+
+    <section class="slide" data-title="Narzędzia">
+      <p class="eyebrow">Warstwa 4 &mdash; Narzędzia (tools)</p>
+      <h2>Jak LLM coś <span class="accent">robi</span> w&nbsp;świecie zewnętrznym</h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Mechanizm w&nbsp;trzech krokach</h3>
+          <ul>
+            <li>Aplikacja wystawia LLM-owi listę funkcji (<code>read_file</code>, <code>run_shell</code>, <code>write_file</code>&hellip;)</li>
+            <li>LLM w&nbsp;odpowiedzi &bdquo;prosi" o&nbsp;wywołanie konkretnej funkcji z&nbsp;argumentami</li>
+            <li>Aplikacja wykonuje, wynik wraca do kontekstu jako kolejny element</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Jak to wygląda technicznie</h3>
+<pre>{
+  "tool": "read_file",
+  "args": { "path": "agents/orchestrator.md" }
+}</pre>
+          <p class="muted" style="margin-top: 1.5vh;">Aplikacja czyta plik, treść wraca do LLM-a, LLM widzi ją w&nbsp;kolejnej inferencji.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Skille">
+      <p class="eyebrow">Warstwa 5 &mdash; Skille</p>
+      <h2>Narzędzia <span class="accent">dodawane przez ciebie</span></h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Co to jest skill</h3>
+          <p>Proceduralne <em>know-how</em> &mdash; &bdquo;jak zrobić X poprawnie <strong>tutaj</strong>". Plik markdown w&nbsp;repo. Bez autonomii, bez roli.</p>
+          <p class="muted" style="margin-top: 1.5vh;">Aplikacja-host wstrzykuje skill do kontekstu, kiedy jest potrzebny &mdash; technicznie tak samo, jak każde inne narzędzie.</p>
+        </div>
+        <div class="card">
+          <h3>Skille w&nbsp;naszym repo</h3>
+          <ul>
+            <li><code>skills/commit-message.md</code> &mdash; jak pisać commit</li>
+            <li><code>skills/file-io-safety.md</code> &mdash; atomic write JSON</li>
+            <li><code>skills/react-board-rendering.md</code> &mdash; renderowanie planszy</li>
+            <li><code>skills/write-adr.md</code> &mdash; szablon ADR-a</li>
+            <li><code>skills/define-typescript-contract.md</code> &mdash; dyskryminowane unie i&nbsp;exhaustive switch</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Agenci">
+      <p class="eyebrow">Warstwa 6 &mdash; Agenci</p>
+      <h2>System prompt <span class="accent">dodawany przez ciebie</span> &mdash; z&nbsp;rolą i&nbsp;misją</h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Wzorzec promptu agenta</h3>
+          <ul>
+            <li><strong class="accent">Rola</strong> &mdash; kim jest, jakie ma kompetencje</li>
+            <li><strong class="accent">Misja / cel</strong> &mdash; co produkuje, na czym polega sukces</li>
+            <li><strong class="accent">Zakres</strong> &mdash; co należy do agenta</li>
+            <li><strong class="accent">Granice</strong> &mdash; czego nie wolno (np. &bdquo;nie dotyka UI")</li>
+            <li><strong class="accent">Kontrakt wyjścia</strong> &mdash; format, struktura, kryteria akceptacji</li>
+          </ul>
+          <p class="muted" style="margin-top: 1.5vh;">Te sekcje znajdziesz w&nbsp;każdym <code>agents/*.md</code> &mdash; pokażę na <code>agents/orchestrator.md</code>.</p>
         </div>
         <div class="card bad">
           <h3>Agent NIE jest</h3>
           <ul>
             <li>Pojedynczym promptem</li>
             <li>Czat-botem ogólnego przeznaczenia</li>
-            <li>Samą bazą wiedzy (RAG)</li>
-            <li>Skillem ani narzędziem &mdash; <em>używa</em> ich</li>
+            <li>Skillem &mdash; <em>używa</em> skilli, nie jest jednym z&nbsp;nich</li>
+            <li>Magią &mdash; to po prostu warstwy 1-5 + twój system prompt</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <section class="slide" data-title="Architektura">
-      <p class="eyebrow">Sekcja 3 &mdash; Architektura wieloagentowa</p>
-      <h2>Jeden kod, cztery role</h2>
+    <section class="slide" data-title="Subagenci">
+      <p class="eyebrow">Warstwa 7 &mdash; Subagenci</p>
+      <h2>Z perspektywy nadrzędnego agenta <span class="accent">subagent to kolejne narzędzie</span></h2>
+      <div class="columns">
+        <div class="card">
+          <h3>Interfejs jak każdy inny tool</h3>
+          <ul>
+            <li><strong>Wejście:</strong> zadanie (tekst)</li>
+            <li><strong>Wyjście:</strong> wynik (tekst, kod, decyzja)</li>
+            <li><strong>W&nbsp;środku:</strong> pełen agent z&nbsp;własnym system promptem, własnym oknem kontekstu, własnymi tool calls</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Po co</h3>
+          <ul>
+            <li><strong>Izolacja kontekstu</strong> &mdash; subagent nie zaśmieca nadrzędnego</li>
+            <li><strong>Specjalizacja</strong> &mdash; inny system prompt, inne narzędzia</li>
+            <li><strong>Równoległość</strong> &mdash; kilku subagentów w&nbsp;tym samym czasie</li>
+          </ul>
+          <p class="muted" style="margin-top: 1.5vh;">W&nbsp;Cursorze: <code>Task</code> tool &mdash; tam tego szukaj.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Orkiestracja">
+      <p class="eyebrow">Warstwa 8 &mdash; Orkiestracja</p>
+      <h2>Cztery role, <span class="accent">jeden interfejs</span> do człowieka</h2>
       <ul>
-        <li><strong class="accent">Orchestrator</strong> &mdash; jedyny interfejs człowieka. Tłumaczy intencję na zadania, scala wyniki.</li>
+        <li><strong class="accent">Orchestrator</strong> &mdash; jedyny rozmówca człowieka. Tłumaczy intencję na zadania, scala wyniki.</li>
         <li><strong class="accent">Architect</strong> &mdash; kontrakty typów, ADR-y, decyzje strukturalne. Pisze spec, nie kod.</li>
         <li><strong class="accent">Backend Developer</strong> &mdash; engine, walidacja ruchu, plik stanu, API.</li>
         <li><strong class="accent">Frontend Developer</strong> &mdash; rendering planszy, klikalność, stan UI.</li>
       </ul>
       <p class="muted" style="margin-top: 4vh;">
-        Każdy zna swoje granice. Człowiek rozmawia tylko z&nbsp;orkiestratorem &mdash; <em>jeden kanał</em>, nie cztery.
+        Każdy zna swoje granice. Ty rozmawiasz tylko z&nbsp;orchestratorem &mdash; <em>jeden kanał</em>, nie cztery.
       </p>
     </section>
 
-    <section class="slide" data-title="Skille vs agenci">
-      <p class="eyebrow">Sekcja 4 &mdash; Skille</p>
-      <h2>Skill <span class="muted">to nie</span> agent</h2>
-      <div class="columns">
-        <div class="card">
-          <h3>Skill</h3>
-          <p>Proceduralne <em>know-how</em>. Instrukcja typu &bdquo;jak to zrobić&rdquo;. Bez autonomii, bez roli.</p>
-          <p class="muted" style="margin-top: 1vh;">
-            Przykład:
-            <code>file-io-safety</code>,
-            <code>commit-message</code>,
-            <code>write-adr</code>.
-          </p>
-        </div>
-        <div class="card">
-          <h3>Agent</h3>
-          <p>Decyzyjna jednostka z&nbsp;rolą, misją i&nbsp;granicami. <em>Sięga</em> po skille, kiedy są potrzebne.</p>
-          <p class="muted" style="margin-top: 1vh;">
-            Przykład:
-            <code>orchestrator</code>,
-            <code>architect</code>,
-            <code>backend-developer</code>.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="slide" data-title="Wzorzec promptu">
-      <p class="eyebrow">Sekcja 5 &mdash; Wzorzec promptu</p>
-      <h2>Jak napisać prompt, który <em>generuje agenta</em></h2>
-      <ul>
-        <li><strong class="accent">Rola</strong> &mdash; kim jest, jakie ma kompetencje.</li>
-        <li><strong class="accent">Cel</strong> &mdash; co produkuje, na czym polega sukces.</li>
-        <li><strong class="accent">Zakres</strong> &mdash; co należy do agenta, co nie.</li>
-        <li><strong class="accent">Twarde ograniczenia</strong> &mdash; czego nie wolno (np. &bdquo;nie dotyka UI&rdquo;).</li>
-        <li><strong class="accent">Kontrakt wyjścia</strong> &mdash; format, struktura, kryteria akceptacji.</li>
+    <section class="slide" data-title="Way of working">
+      <p class="eyebrow">Warstwa 9 &mdash; Way of working</p>
+      <h2><span class="accent">Way of working</span> &mdash; jak się tym pracuje na co dzień</h2>
+      <p class="lead" style="max-width: 60ch;">
+        Jeden prompt do orchestratora po polsku &mdash; reszta dzieje się sama.
+      </p>
+      <ul style="margin-top: 3vh;">
+        <li><strong class="accent">Ty</strong> &mdash; piszesz intencję po polsku: &bdquo;dodaj trzecią grę: Othello"</li>
+        <li><strong class="accent">Orchestrator</strong> &mdash; dzieli na zadania, pisze <em>task brief</em> dla Architecta</li>
+        <li><strong class="accent">Architect</strong> &mdash; definiuje kontrakt typów, deleguje implementację</li>
+        <li><strong class="accent">Backend + Frontend</strong> &mdash; piszą równolegle, każdy w&nbsp;swojej domenie, sięgają po skille</li>
+        <li><strong class="accent">Orchestrator</strong> &mdash; scala diffy, pokazuje ci wynik jednym podsumowaniem</li>
+        <li><strong class="accent">Ty</strong> &mdash; review: &bdquo;OK" albo &bdquo;popraw X" &rarr; kolejna iteracja</li>
       </ul>
-      <p class="muted" style="margin-top: 4vh;">
-        Te same pięć rubryk znajdziesz w&nbsp;każdym pliku <code>agents/*.md</code> w&nbsp;tym repo.
-      </p>
+      <p class="muted" style="margin-top: 4vh;">Za chwilę zobaczycie tę kompozycję w&nbsp;żywym repo. Potem sami się tym pobawicie.</p>
     </section>
 
     <section class="slide" data-title="Repo">
-      <p class="eyebrow">Sekcja 6 &mdash; Repo (1 z 3)</p>
+      <p class="eyebrow">Warstwy w&nbsp;naszym repo (1 z 3)</p>
       <h2>Engine + dwie gry + cztery role</h2>
       <p>
         Sygnał jakości architektury: dodanie trzeciej gry nie wymaga zmian w&nbsp;silniku
@@ -370,7 +1083,7 @@ workshop/plan/              plan + tracker postępu</pre>
     </section>
 
     <section class="slide" data-title="Kontrakt">
-      <p class="eyebrow">Sekcja 6 &mdash; Repo (2 z 3)</p>
+      <p class="eyebrow">Warstwy w&nbsp;naszym repo (2 z 3)</p>
       <h2>Cztery linie, które oddzielają engine od gry</h2>
       <div class="columns">
         <div class="card">
@@ -405,27 +1118,21 @@ workshop/plan/              plan + tracker postępu</pre>
     </section>
 
     <section class="slide" data-title="Druga gra">
-      <p class="eyebrow">Sekcja 6 &mdash; Repo (3 z 3)</p>
+      <p class="eyebrow">Warstwy w&nbsp;naszym repo (3 z 3)</p>
       <h2>Druga gra, ten sam kontrakt, <span class="accent">zero zmian w silniku</span></h2>
       <div class="columns">
         <div class="card">
           <h3>Implementacja: warcaby</h3>
 <pre>validateMove(state, move) {
   // ... bounds + ownership ...
-  const { captures } =
-    allMovesFor(state.board, player);
+  const { captures } = allMovesFor(board, player);
 
   if (move.kind === "step") {
-    if (Math.abs(dr) !== 1 || Math.abs(dc) !== 1)
-      return "Krok musi być po skosie.";
     if (captures.length &gt; 0)
-      return "Bicie jest obowiązkowe.";
+      return "Bicie obowiązkowe.";
     return null;
   }
-  if (move.kind === "capture") {
-    // ... validate jump ...
-    return null;
-  }
+  // ... capture validation ...
 }</pre>
           <p class="muted"><code>packages/games/checkers/src/index.ts</code></p>
         </div>
@@ -448,16 +1155,96 @@ workshop/plan/              plan + tracker postępu</pre>
       </div>
     </section>
 
-    <section class="slide" data-title="Vibe Coding">
-      <p class="eyebrow">Część praktyczna</p>
+    <section class="slide break-slide" data-title="Przerwa" data-no-fragments>
+      <p class="eyebrow">Złap oddech</p>
+      <div class="break-mark" aria-hidden="true">
+        <span class="break-cup">&#x2615;</span>
+      </div>
+      <h1 class="break-title"><span class="accent">Przerwa na kawę</span></h1>
+      <p class="lead break-lead">
+        ~7 minut. Wstańcie, przeciągnijcie się, sięgnijcie po kubek.
+      </p>
+      <p class="muted break-hint">
+        Po przerwie: vibe coding na żywo. Jeśli jeszcze nie macie konta w&nbsp;copilocie &mdash; teraz dobry moment.
+      </p>
+    </section>
+
+    <section class="slide" data-title="Zadania do wyboru">
+      <p class="eyebrow">Część praktyczna &mdash; co jest do zrobienia</p>
+      <h2>Wybierz <span class="accent">jedno zadanie</span></h2>
+      <div class="columns-3">
+        <div class="card">
+          <h3>Z1 &mdash; Licznik ruchów</h3>
+          <p>Na stronie meczu pokaż „Ruch nr&nbsp;5" &mdash; aktualizuje się po każdym kliknięciu.</p>
+          <p class="muted">Dla zielonych z&nbsp;AI copilotem. 5&ndash;8 min.</p>
+        </div>
+        <div class="card">
+          <h3>Z2 &mdash; Podświetlenie ruchu</h3>
+          <p>Pole, na które padł ostatni ruch, błyska na 1&nbsp;sek (np. <code>animate-pulse</code>).</p>
+          <p class="muted">Dla początkujących. 5&ndash;10 min.</p>
+        </div>
+        <div class="card">
+          <h3>Z3 &mdash; Reset matchu</h3>
+          <p>Przycisk „Nowy mecz tej samej gry" &mdash; POST do <code>/api/matches</code> + redirect.</p>
+          <p class="muted">Średnio-zaawansowane. 8&ndash;12 min.</p>
+        </div>
+        <div class="card">
+          <h3>Z4 &mdash; Statystyka wyników</h3>
+          <p>Na stronie głównej liczniki: ile białych / czarnych / remisów. Czytaj <code>data/matches/</code>.</p>
+          <p class="muted">Średnio-zaawansowane. 10&ndash;15 min.</p>
+        </div>
+        <div class="card">
+          <h3>Z5 &mdash; Trzecia gra (Othello)</h3>
+          <p>Nowy folder <code>packages/games/othello-mini/</code> &mdash; bez tykania <code>packages/engine/</code>.</p>
+          <p class="muted">Trudne. 15&ndash;20 min. Sygnał: nie musisz zmieniać enginu.</p>
+        </div>
+        <div class="card">
+          <h3>Twój pomysł</h3>
+          <p>Coś własnego &mdash; ale trzymaj się skali ~10 min i&nbsp;zasad z&nbsp;następnego slajdu.</p>
+          <p class="muted">Na własne ryzyko. Możesz utknąć.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Vibe Coding (instrukcja)">
+      <p class="eyebrow">Część praktyczna &mdash; jak to zrobić</p>
       <h2>Vibe Coding &mdash; instrukcja</h2>
-      <ul>
-        <li>Sklonuj repo: <code>git clone &amp;&amp; npm install &amp;&amp; npm run dev</code>.</li>
-        <li>Otwórz darmowy AI copilot w&nbsp;przeglądarce (np. ChatGPT z&nbsp;darmowym kontem).</li>
-        <li>Wybierz jedno zadanie z&nbsp;listy &bdquo;dopnij funkcję&rdquo;.</li>
-        <li>Wklej kontekst: <code>agents/*.md</code>, odpowiedni <code>GameDefinition</code>, fragment komponentu UI.</li>
-        <li>Masz ~10 minut na działający rezultat. Iteruj &mdash; krótkie cykle, nie jeden mega-prompt.</li>
-      </ul>
+      <div class="columns">
+        <div class="card">
+          <h3>1. Sklonuj repo i&nbsp;odpal lokalnie</h3>
+<pre>git clone https://github.com/fiejkamichal/game-engine.git
+cd game-engine
+npm install
+npm run dev</pre>
+          <p class="muted">Otwórz <code>http://localhost:3000</code> — strona z&nbsp;listą gier.</p>
+        </div>
+        <div class="card">
+          <h3>2. Otwórz copilota AI</h3>
+          <ul>
+            <li><strong>GitHub Copilot Chat</strong> w&nbsp;VS&nbsp;Code / Cursor (jeśli masz licencję).</li>
+            <li>Albo darmowy chat w&nbsp;przeglądarce: <code>chatgpt.com</code>, <code>claude.ai</code>, <code>gemini.google.com</code>.</li>
+          </ul>
+          <p class="muted">Wszystko jedno który — ten warsztat o&nbsp;to <em>jak</em>, nie <em>czym</em>.</p>
+        </div>
+      </div>
+      <div class="columns" style="margin-top: 2.5vh;">
+        <div class="card">
+          <h3>3a. Z copilotem &mdash; <span class="accent">użyj orchestratora</span></h3>
+          <ul>
+            <li>Opisz orchestratorowi po polsku <em>co</em> ma zrobić &mdash; nie <em>jak</em>.</li>
+            <li>Prześledź odpowiedź. <strong>Upewnij się, że delegował robotę do subagentów</strong> (Architect, Backend, Frontend), zamiast pisać wszystko sam.</li>
+            <li>Iteruj &mdash; krótkie cykle, „popraw X", „dorzuć Y".</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>3b. Bez copilota &mdash; <span class="muted">alternatywa</span></h3>
+          <ul>
+            <li>Wklej do darmowego chata kontekst ręcznie: <code>agents/*.md</code>, odpowiedni <code>GameDefinition</code>, fragment komponentu UI.</li>
+            <li>Potem opisz zadanie. Krótkie cykle, nie jeden mega-prompt.</li>
+          </ul>
+          <p class="muted">Brakuje ci tooli i&nbsp;subagentów &mdash; ale wzorzec ten sam.</p>
+        </div>
+      </div>
     </section>
 
     <section class="slide" data-title="Zadanie">
@@ -474,14 +1261,14 @@ workshop/plan/              plan + tracker postępu</pre>
       </p>
     </section>
 
-    <section class="slide" data-title="QA">
+    <section class="slide" data-title="QA" data-no-fragments>
       <p class="eyebrow">Q&amp;A</p>
       <h1>Pytania?</h1>
       <p class="lead" style="margin-top: 5vh;">
         Eksperymenty, kierunki rozwoju, &bdquo;czy mogę zrobić X&rdquo;.
       </p>
       <p class="muted" style="margin-top: 3vh;">
-        Materiały zostają w&nbsp;repo &mdash; możesz wracać. Plan dalszych kroków: <code>workshop/plan/01-action-plan.md</code>.
+        Materiały zostają w&nbsp;repo &mdash; możesz wracać.
       </p>
     </section>
 
@@ -489,7 +1276,7 @@ workshop/plan/              plan + tracker postępu</pre>
 
   <div class="footer">
     <span>AI Generation w praktyce</span>
-    <span><span id="slide-counter">1</span> / <span id="slide-total">13</span></span>
+    <span><span id="slide-counter">1</span> / <span id="slide-total">20</span></span>
   </div>
 
   <div class="nav" role="navigation" aria-label="Nawigacja slajdami">
@@ -497,28 +1284,131 @@ workshop/plan/              plan + tracker postępu</pre>
     <button id="next" type="button" aria-label="Następny slajd">&rarr;</button>
   </div>
 
+  <div class="toolbar">
+    <button id="theme-toggle" class="icon-btn" type="button"
+            aria-label="Przełącz motyw"
+            title="Przełącz motyw (T)">
+      <span id="theme-icon" aria-hidden="true">&#x263E;</span>
+    </button>
+    <button id="menu-toggle" class="icon-btn" type="button"
+            aria-label="Lista slajdów"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            title="Lista slajdów (M)">
+      <span aria-hidden="true">&#x2630;</span>
+    </button>
+  </div>
+
+  <div id="slide-menu" class="slide-menu" role="dialog" aria-modal="true"
+       aria-labelledby="slide-menu-title" hidden>
+    <div class="slide-menu__panel">
+      <div class="slide-menu__header">
+        <h2 id="slide-menu-title" class="slide-menu__title">Lista slajdów</h2>
+        <span class="slide-menu__hint">Esc · zamknij</span>
+      </div>
+      <ul id="slide-menu-list" class="slide-menu__list"></ul>
+    </div>
+  </div>
+
   <script>
     (function () {
       var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
       var total = slides.length;
       var current = 0;
+      var currentFrag = 0;
       var counter = document.getElementById("slide-counter");
       var totalEl = document.getElementById("slide-total");
       var prevBtn = document.getElementById("prev");
       var nextBtn = document.getElementById("next");
       var progress = document.getElementById("progress");
+      var themeBtn = document.getElementById("theme-toggle");
+      var themeIcon = document.getElementById("theme-icon");
+      var menuBtn = document.getElementById("menu-toggle");
+      var menu = document.getElementById("slide-menu");
+      var menuList = document.getElementById("slide-menu-list");
 
       totalEl.textContent = total;
 
-      function show(idx) {
+      /* ----- Theme (dark/light) ----- */
+      var STORAGE_THEME = "presentation-theme";
+      var ICON_MOON = "\u263E"; /* ☾ — wybierz LIGHT */
+      var ICON_SUN  = "\u263C"; /* ☼ — wybierz DARK */
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        if (themeIcon) themeIcon.textContent = theme === "light" ? ICON_SUN : ICON_MOON;
+        if (themeBtn) themeBtn.title = theme === "light"
+          ? "Przełącz na ciemny motyw (T)"
+          : "Przełącz na jasny motyw (T)";
+      }
+      function loadTheme() {
+        try { return localStorage.getItem(STORAGE_THEME) || "dark"; }
+        catch (e) { return "dark"; }
+      }
+      function saveTheme(t) {
+        try { localStorage.setItem(STORAGE_THEME, t); } catch (e) {}
+      }
+      function toggleTheme() {
+        var cur = document.documentElement.getAttribute("data-theme") || "dark";
+        var next = cur === "dark" ? "light" : "dark";
+        applyTheme(next);
+        saveTheme(next);
+      }
+      applyTheme(loadTheme());
+      if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
+
+      // Wykryj slajdy "Warstwa N — …" w eyebrow i dorzuć duży badge z numerem
+      // warstwy w corner. Musi być zrobione PRZED wyznaczeniem fragmentów, żeby
+      // badge nie został oznaczony jako fragment.
+      slides.forEach(function (slide) {
+        var eyebrow = slide.querySelector(":scope > .eyebrow");
+        if (!eyebrow) return;
+        var match = eyebrow.textContent.match(/Warstwa\s+(\d+)/i);
+        if (!match) return;
+        var badge = document.createElement("div");
+        badge.className = "layer-badge";
+        badge.setAttribute("aria-hidden", "true");
+        badge.textContent = match[1];
+        slide.appendChild(badge);
+      });
+
+      // Binary reveal: tylko eyebrow (i layer-badge) widoczne na starcie slajdu.
+      // Pierwsze kliknięcie odsłania CAŁĄ resztę naraz (z subtelnym staggerem
+      // w CSS przez --frag-index). Drugie kliknięcie -> następny slajd.
+      var slideFragments = slides.map(function (slide) {
+        if (slide.hasAttribute("data-no-fragments")) return [];
+        var frags = [];
+        Array.prototype.slice.call(slide.children).forEach(function (child) {
+          if (child.classList.contains("eyebrow")) return;
+          if (child.classList.contains("layer-badge")) return;
+          child.classList.add("fragment");
+          frags.push(child);
+        });
+        frags.forEach(function (f, i) {
+          f.style.setProperty("--frag-index", i);
+        });
+        return frags;
+      });
+
+      function setFragmentsVisibility(slideIdx, count) {
+        var frags = slideFragments[slideIdx] || [];
+        frags.forEach(function (f, i) {
+          f.classList.toggle("visible", i < count);
+        });
+      }
+
+      function show(idx, fragCount) {
         idx = Math.max(0, Math.min(total - 1, idx));
-        if (idx === current) {
-          updateChrome();
-          return;
+        var maxFrags = (slideFragments[idx] || []).length;
+        fragCount = Math.max(0, Math.min(maxFrags, fragCount || 0));
+
+        if (idx !== current) {
+          slides[current].classList.remove("active");
+          slides[idx].classList.add("active");
         }
-        slides[current].classList.remove("active");
-        slides[idx].classList.add("active");
         current = idx;
+        currentFrag = fragCount;
+        setFragmentsVisibility(current, currentFrag);
         updateChrome();
         if (history && history.replaceState) {
           history.replaceState(null, "", "#" + (current + 1));
@@ -527,17 +1417,120 @@ workshop/plan/              plan + tracker postępu</pre>
 
       function updateChrome() {
         counter.textContent = current + 1;
-        prevBtn.disabled = current === 0;
-        nextBtn.disabled = current === total - 1;
+        var frags = slideFragments[current] || [];
+        prevBtn.disabled = current === 0 && currentFrag === 0;
+        nextBtn.disabled = current === total - 1 && currentFrag === frags.length;
         var pct = total <= 1 ? 100 : (current / (total - 1)) * 100;
-        progress.style.width = pct + "%";
+        progress.style.width = Math.min(100, Math.max(0, pct)) + "%";
+
+        if (menuList) {
+          var items = menuList.querySelectorAll(".slide-menu__item");
+          items.forEach(function (btn, i) {
+            btn.classList.toggle("active", i === current);
+            if (i === current) btn.setAttribute("aria-current", "true");
+            else btn.removeAttribute("aria-current");
+          });
+        }
       }
 
-      function next() { show(current + 1); }
-      function prev() { show(current - 1); }
+      function next() {
+        var frags = slideFragments[current] || [];
+        if (frags.length > 0 && currentFrag === 0) {
+          currentFrag = frags.length;
+          setFragmentsVisibility(current, currentFrag);
+          updateChrome();
+        } else if (current < total - 1) {
+          show(current + 1, 0);
+        }
+      }
 
+      function prev() {
+        if (currentFrag > 0) {
+          currentFrag = 0;
+          setFragmentsVisibility(current, currentFrag);
+          updateChrome();
+        } else if (current > 0) {
+          var prevIdx = current - 1;
+          show(prevIdx, (slideFragments[prevIdx] || []).length);
+        }
+      }
+
+      /* ----- Menu z listą slajdów ----- */
+      function buildMenu() {
+        if (!menuList) return;
+        menuList.innerHTML = "";
+        slides.forEach(function (slide, i) {
+          var title = slide.getAttribute("data-title") || ("Slajd " + (i + 1));
+          var li = document.createElement("li");
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "slide-menu__item";
+          btn.innerHTML =
+            '<span class="slide-menu__num">' +
+              String(i + 1).padStart(2, "0") +
+            '</span>' +
+            '<span class="slide-menu__item-title"></span>';
+          btn.querySelector(".slide-menu__item-title").textContent = title;
+          btn.addEventListener("click", function () {
+            closeMenu();
+            show(i, (slideFragments[i] || []).length);
+          });
+          li.appendChild(btn);
+          menuList.appendChild(li);
+        });
+      }
+
+      function openMenu() {
+        if (!menu) return;
+        menu.classList.add("open");
+        menu.hidden = false;
+        if (menuBtn) menuBtn.setAttribute("aria-expanded", "true");
+        var activeItem = menuList.querySelector(".slide-menu__item.active");
+        if (activeItem) {
+          activeItem.focus({ preventScroll: false });
+          if (activeItem.scrollIntoView) {
+            activeItem.scrollIntoView({ block: "center", behavior: "instant" });
+          }
+        } else {
+          var first = menuList.querySelector(".slide-menu__item");
+          if (first) first.focus();
+        }
+      }
+      function closeMenu() {
+        if (!menu) return;
+        menu.classList.remove("open");
+        menu.hidden = true;
+        if (menuBtn) {
+          menuBtn.setAttribute("aria-expanded", "false");
+          menuBtn.focus();
+        }
+      }
+      function toggleMenu() {
+        if (menu && menu.classList.contains("open")) closeMenu();
+        else openMenu();
+      }
+      buildMenu();
+      if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
+      if (menu) {
+        menu.addEventListener("click", function (e) {
+          if (e.target === menu) closeMenu();
+        });
+      }
+
+      /* ----- Klawiatura ----- */
       document.addEventListener("keydown", function (e) {
         if (e.defaultPrevented) return;
+        if (e.key === "Escape") {
+          if (menu && menu.classList.contains("open")) {
+            e.preventDefault();
+            closeMenu();
+          }
+          return;
+        }
+        // Wewnątrz menu wyłączamy nawigację slajdów (oprócz Esc obsłużonego wyżej)
+        if (menu && menu.classList.contains("open")) return;
+        if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+
         if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
           e.preventDefault();
           next();
@@ -546,10 +1539,17 @@ workshop/plan/              plan + tracker postępu</pre>
           prev();
         } else if (e.key === "Home") {
           e.preventDefault();
-          show(0);
+          show(0, 0);
         } else if (e.key === "End") {
           e.preventDefault();
-          show(total - 1);
+          var lastIdx = total - 1;
+          show(lastIdx, (slideFragments[lastIdx] || []).length);
+        } else if (e.key === "t" || e.key === "T") {
+          e.preventDefault();
+          toggleTheme();
+        } else if (e.key === "m" || e.key === "M") {
+          e.preventDefault();
+          toggleMenu();
         }
       });
 
@@ -563,6 +1563,7 @@ workshop/plan/              plan + tracker postępu</pre>
         slides[0].classList.remove("active");
         slides[current].classList.add("active");
       }
+      setFragmentsVisibility(current, currentFrag);
       updateChrome();
     })();
   </script>

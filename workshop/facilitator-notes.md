@@ -20,41 +20,50 @@
   - `packages/engine/src/types.ts`
   - `packages/games/tic-tac-toe/src/index.ts`
   - `packages/games/checkers/src/index.ts`
-  - `agents/orchestrator.md`
+  - `agents/orchestrator.md` (slajd 9 — live demo wzorca promptu)
+  - `skills/commit-message.md` (slajd 8 — przykład skilla)
 - Terminal z aktywnym `npm run dev` (zostawić, nie restartować w trakcie warsztatu).
 
 ## Timing — 90 minut
 
 Każda linia to *kiedy zaczyna się slajd / blok*. Trzymaj się ±2 min.
 
-| Min       | Slajd / blok                  | O czym mówisz                                                                                              | Kontrola                                                                                  |
-|-----------|-------------------------------|------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| 00:00     | 1 — Tytuł                     | Witam, kto ja, kontekst warsztatu, agenda jednym zdaniem.                                                  | —                                                                                         |
-| 02:00     | 2 — Agenda                    | „30 min teorii, 50 min praktyki, 10 min Q&A. Pytania zbieramy na koniec, chyba że coś przerywa zrozumienie." | Zapytaj kto ma konto AI; jeśli brak — przekieruj do założenia w ciągu pierwszej teorii.   |
-| 05:00     | 3 — Krajobraz                 | Pozycjonowanie: prompt → RAG → agent. RAG tylko jako kontrast, nie temat.                                  | „Kto wie, co to RAG?" Szybkie kciuki.                                                     |
-| 12:00     | 4 — Czym JEST i NIE JEST agent | Lewa kolumna: pętla obserwacja→decyzja→akcja. Prawa: czym agent **nie** jest (prompt, chatbot, RAG, skill). | „Powiedzcie mi przykład agenta, który widzieliście" — 1-2 odpowiedzi.                     |
-| 20:00     | 5 — Architektura              | Cztery role z naszego repo. Orchestrator jako jedyny interfejs do człowieka.                               | Pokaż `agents/orchestrator.md` w edytorze (sekcja Boundaries).                            |
-| 28:00     | 6 — Skille vs agenci          | Skill = procedura. Agent = decydent z autonomią. Skill jest *używany*, nie *wywoływany*.                   | „Ktoś rozumie, czemu to ważne?" Krótka dyskusja.                                          |
-| 33:00     | 7 — Wzorzec promptu           | Pięć rubryk: rola → cel → zakres → ograniczenia → kontrakt wyjścia. Pokaż na żywo `agents/architect.md`.   | —                                                                                         |
-| 38:00     | 8 — Repo (1/3)                | Drzewo katalogów. Klucz: *engine* obok *games*, *agents* obok *skills*, *workshop/plan*.                   | Pokaż folder w edytorze.                                                                  |
-| 41:00     | 9 — Kontrakt (2/3)            | `GameDefinition` po lewej, ttt `validateMove` po prawej. Cztery linie kontraktu, ~10 linii implementacji.   | Pokaż `packages/engine/src/types.ts` i `packages/games/tic-tac-toe/src/index.ts`.         |
-| 45:00     | 10 — Druga gra (3/3)          | Warcaby `validateMove` + bramka `git diff HEAD~1 -- packages/engine/ = 0 linii`.                           | Wykonaj komendę na żywo w terminalu, niech wynik mówi sam.                                |
-| 49:00     | 11 — Vibe Coding (instrukcja) | Jak pracować: krótkie cykle, kontekst (`agents/*.md` + odpowiedni `GameDefinition`), 10 minut na rezultat. | „Kto już używał AI copilota?" Kciuki.                                                     |
-| 52:00     | 12 — Zadanie                  | Kryteria sukcesu + lista zadań (sekcja niżej w tym pliku).                                                 | Wybierzcie zadanie, otwórzcie copilota, **start**.                                        |
-| 55:00     | **PRAKTYKA**                  | Uczestnicy kodują. Ty chodzisz między rzędami / na Discordzie.                                             | Po 5, 10, 15 min — szybki check „jak idzie?". Pomóż przy `npm install`, błędach buildu.   |
-| 80:00     | 13 — Q&A                      | „Co działało, co nie. Co warto wziąć do swojego projektu."                                                 | Zaproś 2-3 uczestników do podzielenia się wynikiem.                                       |
-| 88:00     | Domknięcie                    | Repo zostaje. Link do `workshop/plan/`. Materiały publicznie. Podziękowanie.                               | —                                                                                         |
+| Min       | Slajd / blok                   | O czym mówisz                                                                                              | Kontrola                                                                                  |
+|-----------|--------------------------------|------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| 00:00     | 1 — Tytuł                      | Witam, kto ja, kontekst warsztatu, agenda jednym zdaniem.                                                  | —                                                                                         |
+| 02:00     | 2 — Agenda                     | „~30 min teorii, ~50 min praktyki, ~10 min Q&A. Pytania na koniec, chyba że coś przerywa zrozumienie."     | Zapytaj kto ma konto AI; jeśli brak — przekieruj do założenia w trakcie pierwszej teorii. |
+| 05:00     | 3 — Vibe coding (otwarcie)     | Definicja jednym zdaniem + zapowiedź: „zbudujemy razem drabinę warstw od dołu do góry".                    | Kciuki: kto już używał AI copilota?                                                       |
+| 07:00     | 4 — LLM (warstwa 1)            | Funkcja tekst → tekst. Bez stanu, bez pamięci, bez narzędzi. Krótko.                                       | —                                                                                         |
+| 10:00     | 5 — Prompt + inferencja (w. 2) | System / history / user sklejone w jeden tekst = jedna inferencja. Token window jako twardy limit.         | —                                                                                         |
+| 13:00     | 6 — Aplikacja-host (w. 3)      | ChatGPT/Cursor/Copilot to NIE LLM-y — to hosty. Dodają system prompt, context management, UI.              | „Ten sam LLM, dwie aplikacje, inne zachowanie" — przykład z życia, 30 s.                  |
+| 16:00     | 7 — Narzędzia (w. 4)           | Mechanizm tool call w 3 krokach + przykład JSON. Fundament dla skilli i agentów.                           | —                                                                                         |
+| 19:00     | 8 — Skille (w. 5)              | Markdown w repo, wstrzykiwany do kontekstu. Pokaż listę z `skills/`.                                       | Otwórz `skills/commit-message.md` jako przykład formy.                                    |
+| 23:00     | 9 — Agenci (w. 6)              | Pięciorubryczny wzorzec promptu + „Agent NIE jest". Live demo na `agents/orchestrator.md`.                  | Pokaż plik w edytorze, palcem po sekcjach Role/Mission/Boundaries/Tools.                  |
+| 28:00     | 10 — Subagenci (w. 7)          | Subagent = narzędzie z perspektywy rodzica. W Cursorze: `Task` tool. Po co: izolacja + specjalizacja.       | —                                                                                         |
+| 31:00     | 11 — Orkiestracja (w. 8)       | 4 role z repo + 1 interfejs do człowieka. Otwórz `agents/orchestrator.md` sekcja Boundaries.               | —                                                                                         |
+| 34:00     | 12 — Way of working (w. 9)     | Codzienna praktyka: 1 prompt po polsku → orchestrator dzieli → specjaliści piszą → review → iteracja.      | —                                                                                         |
+| 36:00     | 13 — Repo (1/3)                | Drzewo katalogów. Klucz: *engine* obok *games*, *agents* obok *skills*, *workshop/plan*.                   | Pokaż folder w edytorze.                                                                  |
+| 39:00     | 14 — Kontrakt (2/3)            | `GameDefinition` po lewej, ttt `validateMove` po prawej. Cztery linie kontraktu, ~10 linii implementacji.   | Pokaż `packages/engine/src/types.ts` i `packages/games/tic-tac-toe/src/index.ts`.         |
+| 43:00     | 15 — Druga gra (3/3)           | Warcaby `validateMove` + bramka `git diff HEAD~1 -- packages/engine/ = 0 linii`.                           | Wykonaj komendę na żywo w terminalu, niech wynik mówi sam.                                |
+| 47:00     | **16 — Przerwa na kawę**       | ~7 min. Wstać, rozprostować nogi, sięgnąć po kubek. Kto nie ma jeszcze konta w copilocie — teraz.          | Pilnuj zegara — nie więcej niż 8 min, inaczej praktyka się sypie.                         |
+| 54:00     | 17 — Zadania do wyboru         | „Oto co możecie zrobić" — przejedź po Z1-Z5 jednym zdaniem każde, podpowiedz poziomy trudności.            | Niech każdy w głowie wybierze zanim pokażesz instrukcję.                                  |
+| 57:00     | 18 — Vibe Coding (instrukcja)  | „A oto jak to zrobić" — konkretne komendy, gdzie wkleić kontekst, co to znaczy „krótkie cykle".            | Kciuki — kto już sklonował repo?                                                          |
+| 60:00     | 19 — Zadanie (kryteria)        | Kryteria sukcesu: działa po odświeżeniu, nie psuje drugiej gry, jeden commit conventional.                 | „Otwórzcie copilota, **start**."                                                          |
+| 62:00     | **PRAKTYKA**                   | Uczestnicy kodują. Ty chodzisz między rzędami / na Discordzie.                                             | Po 5, 10, 15 min — szybki check „jak idzie?". Pomóż przy `npm install`, błędach buildu.   |
+| 82:00     | 20 — Q&A                       | „Co działało, co nie. Co warto wziąć do swojego projektu."                                                 | Zaproś 2-3 uczestników do podzielenia się wynikiem.                                       |
+| 88:00     | Domknięcie                     | Repo zostaje. Link do `workshop/plan/`. Materiały publicznie. Podziękowanie.                               | —                                                                                         |
 
 ## Momenty kontroli (skróty)
 
 Te punkty pokazują, czy idziesz w dobrym tempie. Jeżeli któryś nie zaskakuje — przyspiesz, zwolnij, lub przejdź dalej.
 
-1. **Po 8 min** — slajd 4 nie zaczęty: za wolno. Skracaj.
-2. **Po 25 min** — slajd 6 (skille) nie zaczęty: za wolno. Slajd 3 i 4 mogły być za bogate. Skracaj resztę teorii o 2 min na slajd.
-3. **Po 40 min** — repo niezaczęte: prawdopodobnie utknąłeś na pytaniach. **Stop pytaniom.** Q&A jest na końcu.
-4. **Po 55 min** — praktyka nieuruchomiona: krytyczne. Skracaj zadanie do najmniejszego (patrz Z1 niżej), nie tłumacz drugi raz.
-5. **W trakcie praktyki**: jeśli >30% uczestników utyka na uruchomieniu repo → **F3** (live demo na ekranie zamiast pracy własnej).
-6. **Po 85 min** — Q&A nieotwarte: domykasz natychmiast, nawet kosztem urwania slajdu 12.
+1. **Po 13 min** — slajd 6 (Aplikacja-host) nie zaczęty: za wolno. Warstwy LLM i prompt mogły zająć za dużo. Skracaj.
+2. **Po 23 min** — slajd 9 (Agenci) nie zaczęty: za wolno. Skracaj subagentów/orkiestrację/way-of-working do absolutnego minimum (po 1-2 min każdy).
+3. **Po 36 min** — slajd 13 (Repo) niezaczęty: prawdopodobnie utknąłeś na pytaniach do teorii. **Stop pytaniom.** Q&A jest na końcu.
+4. **Po 47 min** — przerwa nieotwarta: za wolno z teorią. Otwieraj przerwę natychmiast, slajdy 17-19 skróć (zostały już tylko logistyczne).
+5. **Po 62 min** — praktyka nieuruchomiona: krytyczne. Skracaj zadanie do najmniejszego (Z1), nie tłumacz drugi raz.
+6. **W trakcie praktyki**: jeśli >30% uczestników utyka na uruchomieniu repo → **F3** (live demo na ekranie zamiast pracy własnej).
+7. **Po 85 min** — Q&A nieotwarte: domykasz natychmiast, nawet kosztem urwania slajdu 19 (Zadanie).
 
 ## Lista zadań „dopnij funkcję" do Vibe Codingu
 
@@ -117,6 +126,11 @@ Najczęstsze pytania uczestników i krótka odpowiedź + plik do otwarcia.
 
 | Pytanie                                              | Odpowiedź jednym zdaniem                                                       | Plik do otwarcia                                                  |
 |------------------------------------------------------|--------------------------------------------------------------------------------|-------------------------------------------------------------------|
+| „Czym ChatGPT różni się od Cursora?"                 | Tym samym LLM-em pod spodem — różnią się aplikacją-hostem (system prompt, kontekst kodu, narzędzia). | slajd 6, `agents/orchestrator.md` jako przykład system promptu    |
+| „Co to dokładnie jest system prompt?"                | Pierwszy tekst, który aplikacja podsuwa LLM-owi przed twoimi wiadomościami; nadaje rolę i reguły gry. | slajd 5 + 6                                                       |
+| „Czym agent różni się od skilla?"                    | Skill mówi *jak* (procedura), agent mówi *kto* (rola, cel, granice). Skill jest *używany* przez agenta. | slajd 8 + 9, `skills/README.md` (tabela skill vs agent)           |
+| „Po co mi subagent, skoro mogę zlecić to samo rodzicowi?" | Izolacja kontekstu (nie zaśmieca rodzica), specjalizacja (inny system prompt), równoległość. | slajd 10                                                          |
+| „Co jeśli LLM mi halucynuje?"                        | Ograniczaj kontekst do precyzyjnych plików, używaj kontraktów typów (TypeScript wyłapie część bzdur), krótkie cykle. | `packages/engine/src/types.ts` (kontrakt), `agents/orchestrator.md` (Done criteria) |
 | „Gdzie jest 'mózg' agenta?"                          | W definicji w `agents/*.md` — to spec, nie kod.                                | `agents/orchestrator.md`                                          |
 | „Kto wywołuje engine?"                               | API routes w `apps/web/app/api/matches/.../route.ts`.                          | `apps/web/app/api/matches/[id]/moves/route.ts`                    |
 | „Gdzie zapisuje się stan?"                           | `data/matches/{matchId}.json`, atomic write (skill).                           | `apps/web/lib/file-io.ts` + `skills/file-io-safety.md`            |

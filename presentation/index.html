@@ -879,6 +879,244 @@
     @media (max-width: 900px) {
       .columns, .columns-3 { grid-template-columns: 1fr; }
     }
+
+    /* ===== Slajd-synteza: "cała architektura naraz" (animowany stos warstw) ===== */
+    .ls-stage {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.4vh;
+    }
+    .ls-stack {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse; /* warstwa 1 na dole, 9 na górze */
+      align-items: center;            /* wyśrodkowane wiersze => piramida */
+      gap: clamp(0.25rem, 0.55vh, 0.6rem);
+    }
+
+    /* Piramida: dół (warstwa 1) pełna szerokość, góra (warstwa 9) o połowę węższa,
+       reszta liniowo (krok 6.25%). */
+    .ls-layer:nth-child(1) { width: 100%; }
+    .ls-layer:nth-child(2) { width: 93.75%; }
+    .ls-layer:nth-child(3) { width: 87.5%; }
+    .ls-layer:nth-child(4) { width: 81.25%; }
+    .ls-layer:nth-child(5) { width: 75%; }
+    .ls-layer:nth-child(6) { width: 68.75%; }
+    .ls-layer:nth-child(7) { width: 62.5%; }
+    .ls-layer:nth-child(8) { width: 56.25%; }
+    .ls-layer:nth-child(9) { width: 50%; }
+
+    /* Naprzemienny kierunek wjazdu + cykliczny akcent z palety motywu */
+    .ls-layer:nth-child(odd)  { --ls-dir: -1; }
+    .ls-layer:nth-child(even) { --ls-dir:  1; }
+    .ls-layer:nth-child(3n+1) { --ls-accent: var(--accent);   --ls-glow: var(--accent-glow); }
+    .ls-layer:nth-child(3n+2) { --ls-accent: var(--accent-2); --ls-glow: var(--accent-glow-2); }
+    .ls-layer:nth-child(3n)   { --ls-accent: var(--accent-3); --ls-glow: var(--accent-glow); }
+
+    .ls-layer {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: clamp(0.6rem, 1.2vw, 1.3rem);
+      padding: clamp(0.28rem, 0.6vh, 0.55rem) clamp(0.7rem, 1.3vw, 1.3rem);
+      border: 1px solid var(--border);
+      border-radius: 0.8rem;
+      background: linear-gradient(180deg, var(--card-bg-top) 0%, var(--card-bg-bot) 100%);
+      backdrop-filter: blur(12px) saturate(120%);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+      /* Poświata pigułki przycięta do wiersza — nie wystaje poza niego */
+      overflow: hidden;
+      /* Stan początkowy: niewidoczny, odsunięty w bok, rozmyty */
+      opacity: 0;
+      transform: translateX(calc(var(--ls-dir, -1) * 9vw)) scale(0.96);
+      filter: blur(7px);
+      pointer-events: none;
+      transition:
+        opacity 0.6s var(--ease-out),
+        transform 0.6s var(--ease-out),
+        filter 0.6s var(--ease-out),
+        border-color 0.5s var(--ease-out),
+        box-shadow 0.5s var(--ease-out);
+    }
+    .ls-layer.is-on {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: blur(0);
+      pointer-events: auto;
+    }
+
+    /* Tytuł warstwy = kolorowy, animowany owalny dymek (zamiast numerka w kółku) */
+    .ls-name {
+      position: relative;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      min-width: clamp(6rem, 10vw, 9.5rem);
+      justify-content: center;
+      padding: 0.34em 1.05em;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: clamp(0.82rem, 1.55vmin, 1.35rem);
+      letter-spacing: -0.01em;
+      text-align: center;
+      color: var(--fg);
+      background: linear-gradient(135deg,
+        color-mix(in srgb, var(--ls-accent) 32%, var(--panel-strong)),
+        color-mix(in srgb, var(--ls-accent) 12%, var(--panel-strong)));
+      border: 1px solid color-mix(in srgb, var(--ls-accent) 55%, var(--border-strong));
+      box-shadow: inset 0 0 20px -4px var(--ls-glow);
+      transform: scale(0.45) rotate(-6deg);
+      transition: transform 0.55s var(--ease-out), box-shadow 0.5s var(--ease-out);
+    }
+    .ls-layer.is-on .ls-name { transform: scale(1) rotate(0deg); }
+    .ls-name::before {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border-radius: inherit;
+      background: conic-gradient(from 0deg,
+        var(--ls-accent), transparent 55%, var(--ls-accent));
+      z-index: -1;
+      filter: blur(11px);
+      opacity: 0;
+      transition: opacity 0.5s var(--ease-out);
+      animation: badgeHalo 22s linear infinite;
+    }
+    .ls-layer.is-on .ls-name::before { opacity: 0.6; }
+    .ls-chips {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;   /* chipy dosunięte do prawej krawędzi wiersza */
+      gap: clamp(0.3rem, 0.5vw, 0.6rem);
+      flex: 1;
+      min-width: 0;
+    }
+    .ls-chip {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: clamp(0.62rem, 1vmin, 0.95rem);
+      padding: 0.2em 0.65em;
+      border-radius: 999px;
+      color: var(--fg-2);
+      background: color-mix(in srgb, var(--ls-accent) 14%, transparent);
+      border: 1px solid color-mix(in srgb, var(--ls-accent) 32%, transparent);
+      white-space: nowrap;
+      /* Stan początkowy chipów: pop-in po osadzeniu warstwy */
+      opacity: 0;
+      transform: translateY(9px) scale(0.9);
+      transition:
+        opacity 0.4s var(--ease-out),
+        transform 0.4s var(--ease-out);
+    }
+    .ls-layer.is-on .ls-chip {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition-delay: calc(var(--chip-i, 0) * 0.06s + 0.18s);
+    }
+
+    /* Faza "flow": świetlna fala sunie środkiem piramidy w górę + błysk warstw.
+       Poziomy, wyśrodkowany glow — szerokość dopasowana do piramidy. */
+    .ls-flow {
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      width: min(72%, 40rem);
+      height: clamp(3rem, 9vmin, 7rem);
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, var(--accent-glow), transparent 72%);
+      filter: blur(12px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 4;
+    }
+    .ls-stage.flow .ls-flow { animation: lsPulse 1.9s var(--ease-out); }
+    @keyframes lsPulse {
+      0%   { opacity: 0; top: 100%; }
+      14%  { opacity: 0.95; }
+      86%  { opacity: 0.95; }
+      100% { opacity: 0; top: -4%; }
+    }
+    .ls-stage.flow:not(.finale) .ls-layer.is-on { animation: lsFlash 0.55s var(--ease-out) both; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(1)  { animation-delay: 0.05s; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(2)  { animation-delay: 0.17s; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(3)  { animation-delay: 0.29s; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(4)  { animation-delay: 0.41s; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(5)  { animation-delay: 0.53s; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(6)  { animation-delay: 0.65s; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(7)  { animation-delay: 0.77s; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(8)  { animation-delay: 0.89s; }
+    .ls-stage.flow:not(.finale) .ls-layer:nth-child(9)  { animation-delay: 1.01s; }
+    @keyframes lsFlash {
+      0%, 100% { box-shadow: inset 0 0 18px -10px var(--ls-glow); border-color: var(--border); }
+      50% {
+        box-shadow: 0 0 30px -4px var(--ls-glow), inset 0 0 26px -8px var(--ls-glow);
+        border-color: var(--ls-accent);
+      }
+    }
+
+    /* Finał: spójna poświata na całym stosie */
+    .ls-stage.finale .ls-layer.is-on {
+      border-color: color-mix(in srgb, var(--ls-accent) 55%, var(--border-strong));
+      box-shadow: 0 0 26px -8px var(--ls-glow), inset 0 0 22px -10px var(--ls-glow);
+    }
+
+    /* Sterowanie: przycisk Play/Replay w stylu nawigacji */
+    .ls-controls { display: flex; justify-content: center; margin-top: 2vh; }
+    .ls-play {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      color: var(--fg-2);
+      padding: 0.6rem 1.4rem;
+      border-radius: 0.7rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: clamp(0.85rem, 1vw, 1.2rem);
+      line-height: 1;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition:
+        background 0.3s var(--ease-out),
+        color 0.3s var(--ease-out),
+        border-color 0.3s var(--ease-out),
+        transform 0.3s var(--ease-out),
+        box-shadow 0.3s var(--ease-out);
+    }
+    .ls-play:hover {
+      color: var(--fg);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px -8px var(--accent-glow);
+    }
+    .ls-play:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .ls-play__icon { color: var(--accent); font-size: 0.85em; }
+    .ls-play.is-playing .ls-play__icon { animation: lsPlayPulse 1.1s ease-in-out infinite; }
+    @keyframes lsPlayPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ls-layer, .ls-chip, .ls-name {
+        transition: opacity 0.2s ease !important;
+        transform: none !important;
+        filter: none !important;
+      }
+      .ls-stage.flow .ls-layer,
+      .ls-stage.flow .ls-flow,
+      .ls-name::before,
+      .ls-play.is-playing .ls-play__icon {
+        animation: none !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1111,6 +1349,93 @@
         <li><strong class="accent">Ty</strong> &mdash; review: &bdquo;OK" albo &bdquo;popraw X" &rarr; kolejna iteracja</li>
       </ul>
       <p class="muted" style="margin-top: 4vh;">Za chwilę zobaczycie tę kompozycję w&nbsp;żywym repo. Potem sami się tym pobawicie.</p>
+    </section>
+
+    <section class="slide ls-slide" data-title="Synteza" data-no-fragments data-layer-stack>
+      <p class="eyebrow">Cała architektura naraz</p>
+
+      <div class="ls-stage" data-phase="0">
+        <div class="ls-flow" aria-hidden="true"></div>
+        <ol class="ls-stack">
+          <li class="ls-layer" data-layer="1">
+            <span class="ls-name">Model &mdash; LLM</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">tekst &rarr; tekst</span>
+            </span>
+          </li>
+          <li class="ls-layer" data-layer="2">
+            <span class="ls-name">Prompt</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">system</span>
+              <span class="ls-chip" style="--chip-i:1">history</span>
+              <span class="ls-chip" style="--chip-i:2">user</span>
+            </span>
+          </li>
+          <li class="ls-layer" data-layer="3">
+            <span class="ls-name">Aplikacja</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">ChatGPT</span>
+              <span class="ls-chip" style="--chip-i:1">Cursor</span>
+              <span class="ls-chip" style="--chip-i:2">Copilot</span>
+            </span>
+          </li>
+          <li class="ls-layer" data-layer="4">
+            <span class="ls-name">Narzędzia</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">read_file</span>
+              <span class="ls-chip" style="--chip-i:1">run_shell</span>
+              <span class="ls-chip" style="--chip-i:2">write_file</span>
+            </span>
+          </li>
+          <li class="ls-layer" data-layer="5">
+            <span class="ls-name">Skille</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">commit-message</span>
+              <span class="ls-chip" style="--chip-i:1">file-io-safety</span>
+              <span class="ls-chip" style="--chip-i:2">react-board-rendering</span>
+            </span>
+          </li>
+          <li class="ls-layer" data-layer="6">
+            <span class="ls-name">Agenci</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">Rola</span>
+              <span class="ls-chip" style="--chip-i:1">Misja</span>
+              <span class="ls-chip" style="--chip-i:2">Kontrakt</span>
+            </span>
+          </li>
+          <li class="ls-layer" data-layer="7">
+            <span class="ls-name">Subagenci</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">Task tool</span>
+              <span class="ls-chip" style="--chip-i:1">izolacja</span>
+              <span class="ls-chip" style="--chip-i:2">równoległość</span>
+            </span>
+          </li>
+          <li class="ls-layer" data-layer="8">
+            <span class="ls-name">Orkiestracja</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">Orchestrator</span>
+              <span class="ls-chip" style="--chip-i:1">Architect</span>
+              <span class="ls-chip" style="--chip-i:2">Backend/Frontend</span>
+            </span>
+          </li>
+          <li class="ls-layer" data-layer="9">
+            <span class="ls-name">Way of working</span>
+            <span class="ls-chips">
+              <span class="ls-chip" style="--chip-i:0">Ty</span>
+              <span class="ls-chip" style="--chip-i:1">intencja</span>
+              <span class="ls-chip" style="--chip-i:2">iteracja</span>
+            </span>
+          </li>
+        </ol>
+      </div>
+
+      <div class="ls-controls">
+        <button id="ls-play" class="ls-play" type="button" aria-label="Odtwórz animację" title="Odtwórz (P)">
+          <span class="ls-play__icon" aria-hidden="true">&#9654;</span>
+          <span class="ls-play__label">Odtwórz</span>
+        </button>
+      </div>
     </section>
 
     <section class="slide" data-title="Repo">
@@ -1352,8 +1677,8 @@ npm run dev</pre>
   </main>
 
   <div class="footer">
-    <span>AI Generation w praktyce</span>
-    <span><span id="slide-counter">1</span> / <span id="slide-total">20</span></span>
+    <span id="footer-brand">AI Generation w praktyce</span>
+    <span><span id="slide-counter">1</span> / <span id="slide-total">21</span></span>
   </div>
 
   <div class="nav" role="navigation" aria-label="Nawigacja slajdami">
@@ -1362,6 +1687,11 @@ npm run dev</pre>
   </div>
 
   <div class="toolbar">
+    <button id="lang-toggle" class="icon-btn" type="button"
+            aria-label="Przełącz język"
+            title="Przełącz język (L)">
+      <span id="lang-label" aria-hidden="true">EN</span>
+    </button>
     <button id="theme-toggle" class="icon-btn" type="button"
             aria-label="Przełącz motyw"
             title="Przełącz motyw (T)">
@@ -1406,17 +1736,424 @@ npm run dev</pre>
 
       totalEl.textContent = total;
 
+      /* ----- Language (PL / EN) ----- */
+      var STORAGE_LANG = "presentation-lang";
+      function loadLang() {
+        try { return localStorage.getItem(STORAGE_LANG) === "en" ? "en" : "pl"; }
+        catch (e) { return "pl"; }
+      }
+      function saveLang(l) {
+        try { localStorage.setItem(STORAGE_LANG, l); } catch (e) {}
+      }
+      var curLang = loadLang();
+
+      // Dodatkowe referencje do elementów chrome tłumaczonych po stronie JS.
+      var footerBrand = document.getElementById("footer-brand");
+      var menuHeading = document.getElementById("slide-menu-title");
+      var menuHint = document.querySelector(".slide-menu__hint");
+      var langBtn = document.getElementById("lang-toggle");
+      var langLabel = document.getElementById("lang-label");
+
+      // Stałe napisy interfejsu (poza treścią slajdów).
+      var UI = {
+        docTitle:    { pl: "AI Generation w praktyce: Od teorii do zastosowania", en: "AI Generation in practice: From theory to application" },
+        footerBrand: { pl: "AI Generation w praktyce", en: "AI Generation in practice" },
+        prev:        { pl: "Poprzedni slajd", en: "Previous slide" },
+        next:        { pl: "Następny slajd", en: "Next slide" },
+        themeAria:   { pl: "Przełącz motyw", en: "Toggle theme" },
+        themeToDark: { pl: "Przełącz na ciemny motyw (T)", en: "Switch to dark theme (T)" },
+        themeToLight:{ pl: "Przełącz na jasny motyw (T)", en: "Switch to light theme (T)" },
+        menuAria:    { pl: "Lista slajdów", en: "Slides" },
+        menuTitle:   { pl: "Lista slajdów (M)", en: "Slides (M)" },
+        menuHeading: { pl: "Lista slajdów", en: "Slides" },
+        menuHint:    { pl: "Esc · zamknij", en: "Esc · close" },
+        langAria:    { pl: "Przełącz język", en: "Switch language" },
+        langTitle:   { pl: "Przełącz język (L)", en: "Switch language (L)" },
+        lsPlay:      { pl: "Odtwórz", en: "Play" },
+        lsReplay:    { pl: "Powtórz", en: "Replay" },
+        lsPlayAria:  { pl: "Odtwórz animację warstw", en: "Play the layer animation" },
+        lsPlayTitle: { pl: "Odtwórz (P)", en: "Play (P)" },
+        lsReplayTitle: { pl: "Powtórz (P)", en: "Replay (P)" }
+      };
+
+      // Tytuły slajdów (menu) po angielsku — w kolejności wystąpienia.
+      var TITLES_EN = [
+        "Title", "Agenda", "Vibe Coding", "LLM", "Prompt", "Host App",
+        "Tools", "Skills", "Agents", "Subagents", "Orchestration",
+        "Way of working", "Synthesis", "Repo", "Contract", "Second game",
+        "Break", "Tasks to choose", "Vibe Coding (how-to)", "Task", "Q&A"
+      ];
+
+      // Polska treść (źródło prawdy) — zrzucona z DOM-u zanim cokolwiek
+      // zmodyfikujemy (badge, fragmenty). Pozwala wracać do PL bez duplikacji.
+      var slidePL = slides.map(function (s) { return s.innerHTML; });
+      // Kod QR to ciężki base64 — pobieramy go raz i wstrzykujemy do wersji EN,
+      // żeby nie duplikować ogromnego stringa.
+      var qrImgEl = document.querySelector(".qa-qr img");
+      var qrImgHTML = qrImgEl ? qrImgEl.outerHTML : "";
+
+      // Angielska treść slajdów (innerHTML), w kolejności wystąpienia.
+      var EN_SLIDES = [
+        // 1 — Title
+        '<p class="eyebrow">Workshop • 1.5 h • English</p>' +
+        '<h1>AI Generation in practice<br><span class="accent">From theory to application</span></h1>' +
+        '<p class="lead" style="margin-top: 5vh; max-width: 50ch;">' +
+        'Multi-agent systems, vibe coding, one codebase &mdash; four roles. ' +
+        'A turn-based game engine as a pretext to talk about AI&nbsp;architecture.</p>' +
+        '<p class="byline" style="margin-top: 6vh;">' +
+        '<span><strong class="accent">Michał Fiejka</strong></span>' +
+        '<span class="byline-sep" aria-hidden="true"></span>' +
+        '<span>May 31, 2026</span></p>',
+
+        // 2 — Agenda
+        '<p class="eyebrow">Plan for 90 minutes</p>' +
+        '<h2>Agenda</h2>' +
+        '<ul>' +
+        '<li><strong>~45 min &mdash; Theory.</strong> What multi-agent AI systems <em>are</em> and <em>are not</em>. Orchestration, contracts, skills.</li>' +
+        '<li><strong>~7 min &mdash; Coffee break.</strong> Reset, stretch your legs, log in to your copilot.</li>' +
+        '<li><strong>~30 min &mdash; Practice.</strong> Vibe coding on a live repo. You finish a feature in ~10 minutes using a free copilot.</li>' +
+        '<li><strong>~8 min &mdash; Q&amp;A.</strong> Questions, next steps, materials.</li>' +
+        '</ul>' +
+        '<p class="muted" style="margin-top: 4vh;">Requirements: a laptop, internet, a free AI account (e.g. ChatGPT).</p>',
+
+        // 3 — Vibe Coding
+        '<p class="eyebrow">Starting point</p>' +
+        '<h2>Vibe coding</h2>' +
+        '<p class="lead" style="max-width: 60ch;">Programming where <em>you describe the intent</em>, and the machine writes the code.</p>' +
+        '<p style="margin-top: 4vh; max-width: 60ch;">Sounds simple until you try. Because to do it well &mdash; to know what to give the AI as context, ' +
+        'where to draw the boundaries, when to split a task &mdash; you have to understand the layers underneath.</p>' +
+        '<p class="muted" style="margin-top: 4vh;">Over the next ~25 minutes we&rsquo;ll build them together, from the bottom up.</p>',
+
+        // 4 — LLM
+        '<p class="eyebrow">Layer 1 &mdash; Model</p>' +
+        '<h2>LLM &mdash; a <span class="accent">text &rarr; text</span> function</h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>What it does</h3><p>Takes text as input. Returns text as output. That&rsquo;s it.</p></div>' +
+        '<div class="card"><h3>What it does NOT do</h3><ul>' +
+        '<li>Remembers nothing between calls</li>' +
+        '<li>Has no access to files, the internet, or your editor</li>' +
+        '<li>Doesn&rsquo;t even know it&rsquo;s talking to you &mdash; it sees only one piece of text</li>' +
+        '</ul></div></div>' +
+        '<p class="muted" style="margin-top: 4vh;">That&rsquo;s everything sitting under ChatGPT, Cursor, Copilot. Really.</p>',
+
+        // 5 — Prompt
+        '<p class="eyebrow">Layer 2 &mdash; Prompt + inference</p>' +
+        '<h2>One call = one input text</h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>What makes up a prompt</h3><ul>' +
+        '<li><strong class="accent">system</strong> &mdash; &bdquo;you are a programming assistant"</li>' +
+        '<li><strong class="accent">history</strong> &mdash; previous exchanges in this conversation</li>' +
+        '<li><strong class="accent">user</strong> &mdash; &bdquo;write function X"</li>' +
+        '</ul><p class="muted" style="margin-top: 1.5vh;">All glued into one piece of text, for a single call = one <em>inference</em>.</p></div>' +
+        '<div class="card"><h3>A hard limit</h3>' +
+        '<p><strong>Token window</strong> &mdash; the context has a hard limit (e.g. 200k tokens).</p>' +
+        '<p class="muted" style="margin-top: 1.5vh;">Whatever doesn&rsquo;t fit is lost. Hence the whole topic of <em>context management</em> in the layer above.</p></div></div>',
+
+        // 6 — Host App
+        '<p class="eyebrow">Layer 3 &mdash; Application</p>' +
+        '<h2>ChatGPT, Cursor, Copilot <span class="muted">are not LLMs</span> &mdash; they are <span class="accent">hosts</span></h2>' +
+        '<ul>' +
+        '<li>They write the <strong>system prompt</strong> for you &mdash; giving it a personality and the rules of the game</li>' +
+        '<li>They manage <strong>context</strong> &mdash; compacting long threads, retrieving from files, selecting code fragments</li>' +
+        '<li>They provide a <strong>UI</strong> &mdash; threads, chat, editor, terminal</li>' +
+        '<li>They wire up <strong>tools</strong> &mdash; more on that in a moment</li>' +
+        '</ul>' +
+        '<p class="muted" style="margin-top: 4vh; max-width: 60ch;">The same LLM behaves differently in ChatGPT and in Cursor &mdash; because the applications differ.</p>',
+
+        // 7 — Tools
+        '<p class="eyebrow">Layer 4 &mdash; Tools</p>' +
+        '<h2>How an LLM <span class="accent">does</span> something in the outside world</h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>The mechanism in three steps</h3><ul>' +
+        '<li>The app exposes a list of functions to the LLM (<code>read_file</code>, <code>run_shell</code>, <code>write_file</code>&hellip;)</li>' +
+        '<li>In its response the LLM &bdquo;asks" to call a specific function with arguments</li>' +
+        '<li>The app executes it, and the result returns to the context as another element</li>' +
+        '</ul></div>' +
+        '<div class="card"><h3>What it looks like technically</h3>' +
+        '<pre>{\n  "tool": "read_file",\n  "args": { "path": "agents/orchestrator.md" }\n}</pre>' +
+        '<p class="muted" style="margin-top: 1.5vh;">The app reads the file, the content goes back to the LLM, and the LLM sees it in the next inference.</p></div></div>',
+
+        // 8 — Skills
+        '<p class="eyebrow">Layer 5 &mdash; Skills</p>' +
+        '<h2>Tools <span class="accent">added by you</span></h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>What a skill is</h3>' +
+        '<p>Procedural <em>know-how</em> &mdash; &bdquo;how to do X correctly <strong>here</strong>". A markdown file in the repo. No autonomy, no role.</p>' +
+        '<p class="muted" style="margin-top: 1.5vh;">The host app injects the skill into the context when it&rsquo;s needed &mdash; technically the same as any other tool.</p></div>' +
+        '<div class="card"><h3>Skills in our repo</h3><ul>' +
+        '<li><code>skills/commit-message.md</code> &mdash; how to write a commit</li>' +
+        '<li><code>skills/file-io-safety.md</code> &mdash; atomic JSON write</li>' +
+        '<li><code>skills/react-board-rendering.md</code> &mdash; rendering the board</li>' +
+        '<li><code>skills/write-adr.md</code> &mdash; ADR template</li>' +
+        '<li><code>skills/define-typescript-contract.md</code> &mdash; discriminated unions and exhaustive switch</li>' +
+        '</ul></div></div>',
+
+        // 9 — Agents
+        '<p class="eyebrow">Layer 6 &mdash; Agents</p>' +
+        '<h2>A system prompt <span class="accent">added by you</span> &mdash; with a role and a mission</h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>The agent prompt pattern</h3><ul>' +
+        '<li><strong class="accent">Role</strong> &mdash; who it is, what competencies it has</li>' +
+        '<li><strong class="accent">Mission / goal</strong> &mdash; what it produces, what success means</li>' +
+        '<li><strong class="accent">Scope</strong> &mdash; what belongs to the agent</li>' +
+        '<li><strong class="accent">Boundaries</strong> &mdash; what&rsquo;s off-limits (e.g. &bdquo;doesn&rsquo;t touch the UI")</li>' +
+        '<li><strong class="accent">Output contract</strong> &mdash; format, structure, acceptance criteria</li>' +
+        '</ul><p class="muted" style="margin-top: 1.5vh;">You&rsquo;ll find these sections in every <code>agents/*.md</code> &mdash; I&rsquo;ll show it on <code>agents/orchestrator.md</code>.</p></div>' +
+        '<div class="card bad"><h3>An agent is NOT</h3><ul>' +
+        '<li>A single prompt</li>' +
+        '<li>A general-purpose chatbot</li>' +
+        '<li>A skill &mdash; it <em>uses</em> skills, it isn&rsquo;t one of them</li>' +
+        '<li>Magic &mdash; it&rsquo;s simply layers 1-5 + your system prompt</li>' +
+        '</ul></div></div>',
+
+        // 10 — Subagents
+        '<p class="eyebrow">Layer 7 &mdash; Subagents</p>' +
+        '<h2>From the parent agent&rsquo;s perspective, <span class="accent">a subagent is just another tool</span></h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>An interface like any other tool</h3><ul>' +
+        '<li><strong>Input:</strong> a task (text)</li>' +
+        '<li><strong>Output:</strong> a result (text, code, decision)</li>' +
+        '<li><strong>Inside:</strong> a full agent with its own system prompt, its own context window, its own tool calls</li>' +
+        '</ul></div>' +
+        '<div class="card"><h3>Why</h3><ul>' +
+        '<li><strong>Context isolation</strong> &mdash; the subagent doesn&rsquo;t clutter the parent</li>' +
+        '<li><strong>Specialization</strong> &mdash; a different system prompt, different tools</li>' +
+        '<li><strong>Parallelism</strong> &mdash; several subagents at the same time</li>' +
+        '</ul><p class="muted" style="margin-top: 1.5vh;">In Cursor: the <code>Task</code> tool &mdash; that&rsquo;s where to look.</p></div></div>',
+
+        // 11 — Orchestration
+        '<p class="eyebrow">Layer 8 &mdash; Orchestration</p>' +
+        '<h2>Four roles, <span class="accent">one interface</span> to the human</h2>' +
+        '<ul>' +
+        '<li><strong class="accent">Orchestrator</strong> &mdash; the human&rsquo;s only interlocutor. Translates intent into tasks, merges results.</li>' +
+        '<li><strong class="accent">Architect</strong> &mdash; type contracts, ADRs, structural decisions. Writes specs, not code.</li>' +
+        '<li><strong class="accent">Backend Developer</strong> &mdash; engine, move validation, state file, API.</li>' +
+        '<li><strong class="accent">Frontend Developer</strong> &mdash; board rendering, clickability, UI state.</li>' +
+        '</ul>' +
+        '<p class="muted" style="margin-top: 4vh;">Each knows its boundaries. You talk only to the orchestrator &mdash; <em>one channel</em>, not four.</p>',
+
+        // 12 — Way of working
+        '<p class="eyebrow">Layer 9 &mdash; Way of working</p>' +
+        '<h2><span class="accent">Way of working</span> &mdash; how you work with this day to day</h2>' +
+        '<p class="lead" style="max-width: 60ch;">One prompt to the orchestrator in plain language &mdash; the rest happens on its own.</p>' +
+        '<ul style="margin-top: 3vh;">' +
+        '<li><strong class="accent">You</strong> &mdash; write the intent in plain language: &bdquo;add a third game: Othello"</li>' +
+        '<li><strong class="accent">Orchestrator</strong> &mdash; splits it into tasks, writes a <em>task brief</em> for the Architect</li>' +
+        '<li><strong class="accent">Architect</strong> &mdash; defines the type contract, delegates implementation</li>' +
+        '<li><strong class="accent">Backend + Frontend</strong> &mdash; write in parallel, each in their own domain, reaching for skills</li>' +
+        '<li><strong class="accent">Orchestrator</strong> &mdash; merges the diffs, shows you the result in a single summary</li>' +
+        '<li><strong class="accent">You</strong> &mdash; review: &bdquo;OK" or &bdquo;fix X" &rarr; another iteration</li>' +
+        '</ul>' +
+        '<p class="muted" style="margin-top: 4vh;">In a moment you&rsquo;ll see this composition in a live repo. Then you&rsquo;ll play with it yourselves.</p>',
+
+        // 12b — Synthesis (animated layer stack)
+        '<p class="eyebrow">The whole architecture at once</p>' +
+        '<div class="ls-stage" data-phase="0">' +
+        '<div class="ls-flow" aria-hidden="true"></div>' +
+        '<ol class="ls-stack">' +
+        '<li class="ls-layer" data-layer="1"><span class="ls-name">Model &mdash; LLM</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">text &rarr; text</span></span></li>' +
+        '<li class="ls-layer" data-layer="2"><span class="ls-name">Prompt</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">system</span>' +
+        '<span class="ls-chip" style="--chip-i:1">history</span>' +
+        '<span class="ls-chip" style="--chip-i:2">user</span></span></li>' +
+        '<li class="ls-layer" data-layer="3"><span class="ls-name">Application</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">ChatGPT</span>' +
+        '<span class="ls-chip" style="--chip-i:1">Cursor</span>' +
+        '<span class="ls-chip" style="--chip-i:2">Copilot</span></span></li>' +
+        '<li class="ls-layer" data-layer="4"><span class="ls-name">Tools</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">read_file</span>' +
+        '<span class="ls-chip" style="--chip-i:1">run_shell</span>' +
+        '<span class="ls-chip" style="--chip-i:2">write_file</span></span></li>' +
+        '<li class="ls-layer" data-layer="5"><span class="ls-name">Skills</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">commit-message</span>' +
+        '<span class="ls-chip" style="--chip-i:1">file-io-safety</span>' +
+        '<span class="ls-chip" style="--chip-i:2">react-board-rendering</span></span></li>' +
+        '<li class="ls-layer" data-layer="6"><span class="ls-name">Agents</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">Role</span>' +
+        '<span class="ls-chip" style="--chip-i:1">Mission</span>' +
+        '<span class="ls-chip" style="--chip-i:2">Contract</span></span></li>' +
+        '<li class="ls-layer" data-layer="7"><span class="ls-name">Subagents</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">Task tool</span>' +
+        '<span class="ls-chip" style="--chip-i:1">isolation</span>' +
+        '<span class="ls-chip" style="--chip-i:2">parallelism</span></span></li>' +
+        '<li class="ls-layer" data-layer="8"><span class="ls-name">Orchestration</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">Orchestrator</span>' +
+        '<span class="ls-chip" style="--chip-i:1">Architect</span>' +
+        '<span class="ls-chip" style="--chip-i:2">Backend/Frontend</span></span></li>' +
+        '<li class="ls-layer" data-layer="9"><span class="ls-name">Way of working</span>' +
+        '<span class="ls-chips"><span class="ls-chip" style="--chip-i:0">You</span>' +
+        '<span class="ls-chip" style="--chip-i:1">intent</span>' +
+        '<span class="ls-chip" style="--chip-i:2">iteration</span></span></li>' +
+        '</ol>' +
+        '</div>' +
+        '<div class="ls-controls">' +
+        '<button id="ls-play" class="ls-play" type="button" aria-label="Play the animation" title="Play (P)">' +
+        '<span class="ls-play__icon" aria-hidden="true">&#9654;</span>' +
+        '<span class="ls-play__label">Play</span>' +
+        '</button></div>',
+
+        // 13 — Repo
+        '<p class="eyebrow">Layers in our repo (1 of 3)</p>' +
+        '<h2>Engine + two games + four roles</h2>' +
+        '<p>A signal of architectural quality: adding a third game requires no changes to the engine &mdash; only a new folder under <code>packages/games/</code>.</p>' +
+        '<pre>apps/web/\n' +
+        '  &#9500;&#9472; app/\n' +
+        '  &#9474;   &#9500;&#9472; api/games/                GET   /api/games\n' +
+        '  &#9474;   &#9500;&#9472; api/matches/              POST  /api/matches\n' +
+        '  &#9474;   &#9500;&#9472; api/matches/[id]/         GET   load\n' +
+        '  &#9474;   &#9500;&#9472; api/matches/[id]/moves/   POST  apply\n' +
+        '  &#9474;   &#9500;&#9472; page.tsx                  game list\n' +
+        '  &#9474;   &#9492;&#9472; match/[id]/               board + clickability\n' +
+        '  &#9492;&#9472; lib/                          game registry, atomic JSON write\n' +
+        'packages/engine/            engine (types + runtime), game-agnostic\n' +
+        'packages/games/\n' +
+        '  &#9500;&#9472; tic-tac-toe/              GameDefinition (~80 LoC)\n' +
+        '  &#9492;&#9472; checkers/                 GameDefinition (~250 LoC)\n' +
+        'data/matches/{id}.json      match state, JSON on disk\n' +
+        'agents/                     4 roles + delivery meta-agent\n' +
+        'docs/architecture/          ADR 0001-2: split + contract\n' +
+        'workshop/plan/              plan + progress tracker</pre>',
+
+        // 14 — Contract
+        '<p class="eyebrow">Layers in our repo (2 of 3)</p>' +
+        '<h2>Four lines that separate the engine from the game</h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>Contract: <code>GameDefinition</code></h3>' +
+        '<pre>interface GameDefinition&lt;TKind, TMove&gt; {\n' +
+        '  readonly id: string;\n' +
+        '  readonly displayName: string;\n' +
+        '  readonly boardSize: BoardSize;\n\n' +
+        '  initialState: (matchId) =&gt; GameState;\n' +
+        '  validateMove: (state, move) =&gt; string | null;\n' +
+        '  applyMove:    (state, move) =&gt; GameState;\n' +
+        '  getOutcome:   (state) =&gt; Outcome;\n' +
+        '}</pre>' +
+        '<p class="muted"><code>packages/engine/src/types.ts</code></p></div>' +
+        '<div class="card"><h3>Implementation: tic-tac-toe</h3>' +
+        '<pre>validateMove(state, move) {\n' +
+        '  if (move.kind !== "place")\n' +
+        '    return "Unknown move kind.";\n' +
+        '  const { row, col } = move.cell;\n' +
+        '  if (row &lt; 0 || row &gt;= 3 || col &lt; 0 || col &gt;= 3)\n' +
+        '    return "Out of bounds.";\n' +
+        '  if (state.board[row][col] !== null)\n' +
+        '    return "Already occupied.";\n' +
+        '  return null;\n' +
+        '}</pre>' +
+        '<p class="muted"><code>packages/games/tic-tac-toe/src/index.ts</code></p></div></div>',
+
+        // 15 — Second game
+        '<p class="eyebrow">Layers in our repo (3 of 3)</p>' +
+        '<h2>A second game, the same contract, <span class="accent">zero engine changes</span></h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>Implementation: checkers</h3>' +
+        '<pre>validateMove(state, move) {\n' +
+        '  // ... bounds + ownership ...\n' +
+        '  const { captures } = allMovesFor(board, player);\n\n' +
+        '  if (move.kind === "step") {\n' +
+        '    if (captures.length &gt; 0)\n' +
+        '      return "Capture is mandatory.";\n' +
+        '    return null;\n' +
+        '  }\n' +
+        '  // ... capture validation ...\n' +
+        '}</pre>' +
+        '<p class="muted"><code>packages/games/checkers/src/index.ts</code></p></div>' +
+        '<div class="card"><h3>A measurable gate</h3>' +
+        '<pre>$ git diff HEAD~1 -- packages/engine/\n\n(0 lines)</pre>' +
+        '<p>Adding checkers touched only:</p><ul>' +
+        '<li><code>packages/games/checkers/</code> &mdash; a new folder</li>' +
+        '<li><code>apps/web/lib/games-registry.ts</code> &mdash; +2 lines</li>' +
+        '<li><code>apps/web/lib/games-ui.ts</code> &mdash; a new file</li>' +
+        '<li><code>next.config.mjs</code> &mdash; one entry in <code>transpilePackages</code></li>' +
+        '</ul><p class="muted" style="margin-top: 2vh;">A third game: the same pattern, the same diff.</p></div></div>',
+
+        // 16 — Break
+        '<p class="eyebrow">Catch your breath</p>' +
+        '<div class="break-mark" aria-hidden="true"><span class="break-cup">&#x2615;</span></div>' +
+        '<h1 class="break-title"><span class="accent">Coffee break</span></h1>' +
+        '<p class="lead break-lead">~7 minutes. Stand up, stretch, grab a mug.</p>' +
+        '<p class="muted break-hint">After the break: vibe coding live. If you don&rsquo;t have a copilot account yet &mdash; now&rsquo;s a good time.</p>' +
+        '<p class="break-repo">You can already clone: <code>github.com/fiejkamichal/game-engine</code></p>',
+
+        // 17 — Tasks to choose
+        '<p class="eyebrow">Practical part &mdash; what there is to do</p>' +
+        '<h2>Pick <span class="accent">one task</span></h2>' +
+        '<div class="columns-3">' +
+        '<div class="card"><h3>T1 &mdash; Move counter</h3><p>On the match page show &bdquo;Move no.&nbsp;5" &mdash; it updates after every click.</p><p class="muted">For beginners with an AI copilot. 5&ndash;8 min.</p></div>' +
+        '<div class="card"><h3>T2 &mdash; Move highlight</h3><p>The cell of the last move flashes for 1&nbsp;sec (e.g. <code>animate-pulse</code>).</p><p class="muted">For beginners. 5&ndash;10 min.</p></div>' +
+        '<div class="card"><h3>T3 &mdash; Match reset</h3><p>A &bdquo;New match of the same game" button &mdash; POST to <code>/api/matches</code> + redirect.</p><p class="muted">Intermediate. 8&ndash;12 min.</p></div>' +
+        '<div class="card"><h3>T4 &mdash; Results stats</h3><p>On the home page, counters: how many white / black / draws. Read <code>data/matches/</code>.</p><p class="muted">Intermediate. 10&ndash;15 min.</p></div>' +
+        '<div class="card"><h3>T5 &mdash; Third game (Othello)</h3><p>A new folder <code>packages/games/othello-mini/</code> &mdash; without touching <code>packages/engine/</code>.</p><p class="muted">Hard. 15&ndash;20 min. The signal: you don&rsquo;t need to change the engine.</p></div>' +
+        '<div class="card"><h3>Your own idea</h3><p>Something of your own &mdash; but keep it to ~10 min and the rules on the next slide.</p><p class="muted">At your own risk. You might get stuck.</p></div>' +
+        '</div>',
+
+        // 18 — Vibe Coding (how-to)
+        '<p class="eyebrow">Practical part &mdash; how to do it</p>' +
+        '<h2>Vibe Coding &mdash; how-to</h2>' +
+        '<div class="columns">' +
+        '<div class="card"><h3>1. Clone the repo and run it locally</h3>' +
+        '<pre>git clone https://github.com/fiejkamichal/game-engine.git\ncd game-engine\nnpm install\nnpm run dev</pre>' +
+        '<p class="muted">Open <code>http://localhost:3000</code> &mdash; the page with the game list.</p></div>' +
+        '<div class="card"><h3>2. Open an AI copilot</h3><ul>' +
+        '<li><strong>GitHub Copilot Chat</strong> in VS&nbsp;Code / Cursor (if you have a license).</li>' +
+        '<li>Or a free browser chat: <code>chatgpt.com</code>, <code>claude.ai</code>, <code>gemini.google.com</code>.</li>' +
+        '</ul><p class="muted">It doesn&rsquo;t matter which &mdash; this workshop is about the <em>how</em>, not the <em>what</em>.</p></div></div>' +
+        '<div class="columns" style="margin-top: 2.5vh;">' +
+        '<div class="card"><h3>3a. With a copilot &mdash; <span class="accent">use the orchestrator</span></h3><ul>' +
+        '<li>Describe to the orchestrator in plain language <em>what</em> it should do &mdash; not <em>how</em>.</li>' +
+        '<li>Follow the response. <strong>Make sure it delegated the work to subagents</strong> (Architect, Backend, Frontend) instead of writing everything itself.</li>' +
+        '<li>Iterate &mdash; short cycles, &bdquo;fix X", &bdquo;add Y".</li>' +
+        '</ul></div>' +
+        '<div class="card"><h3>3b. Without a copilot &mdash; <span class="muted">an alternative</span></h3><ul>' +
+        '<li>Paste the context into a free chat manually: <code>agents/*.md</code>, the relevant <code>GameDefinition</code>, a fragment of the UI component.</li>' +
+        '<li>Then describe the task. Short cycles, not one mega-prompt.</li>' +
+        '</ul><p class="muted">You&rsquo;re missing tools and subagents &mdash; but the pattern is the same.</p></div></div>',
+
+        // 19 — Task
+        '<p class="eyebrow">Your task</p>' +
+        '<h2>Success criteria</h2>' +
+        '<ul>' +
+        '<li>The feature works after a page refresh.</li>' +
+        '<li>State is saved to <code>data/matches/&lt;id&gt;.json</code> &mdash; open it and check.</li>' +
+        '<li>You don&rsquo;t break the other game (tic-tac-toe ↔ checkers work independently).</li>' +
+        '<li>One commit, conventional commits (<code>feat:</code>, <code>fix:</code>, <code>refactor:</code>).</li>' +
+        '</ul>' +
+        '<p class="muted" style="margin-top: 4vh;">Bonus: add a short ADR in <code>docs/architecture/</code> if the decision is non-trivial.</p>',
+
+        // 20 — Q&A
+        '<p class="eyebrow">Q&amp;A</p>' +
+        '<h1>Questions?</h1>' +
+        '<div class="qa-layout">' +
+        '<div class="qa-text">' +
+        '<p class="lead" style="margin-top: 5vh;">Experiments, directions for growth, &bdquo;can I do X&rdquo;.</p>' +
+        '<p class="muted" style="margin-top: 3vh;">The materials stay in the repo &mdash; you can come back to them.</p>' +
+        '<p class="muted qa-feedback">And if you have a moment &mdash; fill out a short post-workshop survey. ' +
+        'It takes 2 minutes and helps me improve future editions.</p>' +
+        '</div>' +
+        '<figure class="qa-qr">' +
+        '<a href="https://forms.gle/9qZXiBZg9LM59jZS9" target="_blank" rel="noopener noreferrer" aria-label="Open the survey form">' +
+        qrImgHTML +
+        '</a>' +
+        '<figcaption class="muted">Scan or click &mdash; survey (2&nbsp;min)<br/>' +
+        '<a class="qa-qr__link" href="https://forms.gle/9qZXiBZg9LM59jZS9" target="_blank" rel="noopener noreferrer">forms.gle/9qZXiBZg9LM59jZS9</a>' +
+        '</figcaption></figure></div>'
+      ];
+
       /* ----- Theme (dark/light) ----- */
       var STORAGE_THEME = "presentation-theme";
       var ICON_MOON = "\u263E"; /* ☾ — wybierz LIGHT */
       var ICON_SUN  = "\u263C"; /* ☼ — wybierz DARK */
 
+      function updateThemeTitle() {
+        if (!themeBtn) return;
+        var t = document.documentElement.getAttribute("data-theme") || "dark";
+        themeBtn.title = t === "light" ? UI.themeToDark[curLang] : UI.themeToLight[curLang];
+      }
       function applyTheme(theme) {
         document.documentElement.setAttribute("data-theme", theme);
         if (themeIcon) themeIcon.textContent = theme === "light" ? ICON_SUN : ICON_MOON;
-        if (themeBtn) themeBtn.title = theme === "light"
-          ? "Przełącz na ciemny motyw (T)"
-          : "Przełącz na jasny motyw (T)";
+        updateThemeTitle();
       }
       function loadTheme() {
         try { return localStorage.getItem(STORAGE_THEME) || "dark"; }
@@ -1427,45 +2164,185 @@ npm run dev</pre>
       }
       function toggleTheme() {
         var cur = document.documentElement.getAttribute("data-theme") || "dark";
-        var next = cur === "dark" ? "light" : "dark";
-        applyTheme(next);
-        saveTheme(next);
+        var nextT = cur === "dark" ? "light" : "dark";
+        applyTheme(nextT);
+        saveTheme(nextT);
       }
       applyTheme(loadTheme());
       if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
 
-      // Wykryj slajdy "Warstwa N — …" w eyebrow i dorzuć duży badge z numerem
-      // warstwy w corner. Musi być zrobione PRZED wyznaczeniem fragmentów, żeby
-      // badge nie został oznaczony jako fragment.
-      slides.forEach(function (slide) {
-        var eyebrow = slide.querySelector(":scope > .eyebrow");
-        if (!eyebrow) return;
-        var match = eyebrow.textContent.match(/Warstwa\s+(\d+)/i);
-        if (!match) return;
-        var badge = document.createElement("div");
-        badge.className = "layer-badge";
-        badge.setAttribute("aria-hidden", "true");
-        badge.textContent = match[1];
-        slide.appendChild(badge);
-      });
+      var slideFragments = [];
 
-      // Binary reveal: tylko eyebrow (i layer-badge) widoczne na starcie slajdu.
-      // Pierwsze kliknięcie odsłania CAŁĄ resztę naraz (z subtelnym staggerem
-      // w CSS przez --frag-index). Drugie kliknięcie -> następny slajd.
-      var slideFragments = slides.map(function (slide) {
-        if (slide.hasAttribute("data-no-fragments")) return [];
-        var frags = [];
-        Array.prototype.slice.call(slide.children).forEach(function (child) {
-          if (child.classList.contains("eyebrow")) return;
-          if (child.classList.contains("layer-badge")) return;
-          child.classList.add("fragment");
-          frags.push(child);
+      // (Ponowne) zbudowanie badge'y warstw i listy fragmentów. Uruchamiane na
+      // starcie ORAZ po każdej zmianie języka — bo podmiana innerHTML slajdu
+      // kasuje wstrzyknięty badge i klasy .fragment.
+      function enhanceSlides() {
+        // Wykryj slajdy "Warstwa N / Layer N" w eyebrow i dorzuć duży badge
+        // z numerem warstwy. Musi być PRZED wyznaczeniem fragmentów.
+        slides.forEach(function (slide) {
+          var eyebrow = slide.querySelector(":scope > .eyebrow");
+          if (!eyebrow) return;
+          var match = eyebrow.textContent.match(/(?:Warstwa|Layer)\s+(\d+)/i);
+          if (!match) return;
+          var badge = document.createElement("div");
+          badge.className = "layer-badge";
+          badge.setAttribute("aria-hidden", "true");
+          badge.textContent = match[1];
+          slide.appendChild(badge);
         });
-        frags.forEach(function (f, i) {
-          f.style.setProperty("--frag-index", i);
+
+        // Binary reveal: tylko eyebrow (i layer-badge) widoczne na starcie slajdu.
+        slideFragments = slides.map(function (slide) {
+          if (slide.hasAttribute("data-no-fragments")) return [];
+          var frags = [];
+          Array.prototype.slice.call(slide.children).forEach(function (child) {
+            if (child.classList.contains("eyebrow")) return;
+            if (child.classList.contains("layer-badge")) return;
+            child.classList.add("fragment");
+            frags.push(child);
+          });
+          frags.forEach(function (f, i) {
+            f.style.setProperty("--frag-index", i);
+          });
+          return frags;
         });
-        return frags;
-      });
+
+        // Re-bind kontrolera animowanego slajdu-syntezy po przebudowie DOM-u.
+        setupLayerStack();
+      }
+
+      /* ----- Slajd-synteza: choreografia stosu warstw ----- */
+      // Faza 0 = sam tytuł; 1..9 = kolejne warstwy; 10 = puls "flow"; 11 = finał.
+      var LS_MAX_PHASE = 11;
+      var lsPhase = 0;          // przeżywa podmianę języka (zmienna domknięcia)
+      var lsTimer = null;       // uchwyt auto-odtwarzania
+      var lsIndex = -1;         // indeks slajdu-syntezy w `slides`
+      var lsStage = null;       // .ls-stage aktualnego slajdu
+      var lsLayers = [];        // .ls-layer[]
+      var lsPlayBtn = null;     // przycisk Play/Replay
+
+      function lsClearTimer() {
+        if (lsTimer) { clearTimeout(lsTimer); lsTimer = null; }
+      }
+
+      function lsUpdatePlayBtn() {
+        if (!lsPlayBtn) return;
+        var atEnd = lsPhase >= LS_MAX_PHASE;
+        var label = lsPlayBtn.querySelector(".ls-play__label");
+        if (label) label.textContent = atEnd ? UI.lsReplay[curLang] : UI.lsPlay[curLang];
+        lsPlayBtn.setAttribute("aria-label", UI.lsPlayAria[curLang]);
+        lsPlayBtn.title = atEnd ? UI.lsReplayTitle[curLang] : UI.lsPlayTitle[curLang];
+        lsPlayBtn.classList.toggle("is-playing", !!lsTimer);
+      }
+
+      function lsRender(phase) {
+        lsPhase = Math.max(0, Math.min(LS_MAX_PHASE, phase));
+        if (!lsStage) { lsUpdatePlayBtn(); return; }
+        lsStage.setAttribute("data-phase", String(lsPhase));
+        var litLayers = Math.min(lsPhase, 9);
+        lsLayers.forEach(function (li) {
+          var n = parseInt(li.getAttribute("data-layer"), 10) || 0;
+          li.classList.toggle("is-on", n <= litLayers);
+        });
+        // .flow odpalamy tylko "na świeżo" wchodząc w fazę 10 (klasa restartuje keyframe).
+        lsStage.classList.toggle("flow", lsPhase >= 10);
+        lsStage.classList.toggle("finale", lsPhase >= 11);
+        lsUpdatePlayBtn();
+      }
+
+      // Zwraca true, jeśli krok został "skonsumowany" (zostajemy na slajdzie).
+      function lsStep(dir) {
+        lsClearTimer();
+        var target = lsPhase + dir;
+        if (target < 0 || target > LS_MAX_PHASE) {
+          lsUpdatePlayBtn();
+          return false; // brzeg → pozwól nawigacji zmienić slajd
+        }
+        lsRender(target);
+        return true;
+      }
+
+      function lsPlay() {
+        lsClearTimer();
+        if (lsPhase >= LS_MAX_PHASE) lsRender(0); // replay od zera
+        lsUpdatePlayBtn();
+        var tick = function () {
+          if (lsPhase >= LS_MAX_PHASE) { lsClearTimer(); lsUpdatePlayBtn(); return; }
+          // Warstwy 1..9 szybciej, finałowe bity (flow/finał) z większym oddechem.
+          var delay = lsPhase >= 9 ? 1500 : 620;
+          lsRender(lsPhase + 1);
+          lsTimer = setTimeout(tick, delay);
+        };
+        tick();
+      }
+
+      // toEnd=true → pełny, ukończony stan (gdy wchodzimy "od tyłu").
+      function lsReset(toEnd) {
+        lsClearTimer();
+        lsRender(toEnd ? LS_MAX_PHASE : 0);
+      }
+
+      function setupLayerStack() {
+        lsIndex = -1;
+        for (var i = 0; i < slides.length; i++) {
+          if (slides[i].hasAttribute("data-layer-stack")) { lsIndex = i; break; }
+        }
+        if (lsIndex === -1) { lsStage = null; lsLayers = []; lsPlayBtn = null; return; }
+        var slide = slides[lsIndex];
+        lsStage = slide.querySelector(".ls-stage");
+        lsLayers = Array.prototype.slice.call(slide.querySelectorAll(".ls-layer"));
+        lsPlayBtn = slide.querySelector("#ls-play");
+        if (lsPlayBtn && !lsPlayBtn.__bound) {
+          lsPlayBtn.addEventListener("click", lsPlay);
+          lsPlayBtn.__bound = true;
+        }
+        // Odtwórz aktualną fazę (np. po zmianie języka przebudowano DOM).
+        lsRender(lsPhase);
+      }
+
+      /* ----- Zastosuj język ----- */
+      function applyLang(lang) {
+        lang = lang === "en" ? "en" : "pl";
+        curLang = lang;
+        saveLang(lang);
+        document.documentElement.setAttribute("lang", lang);
+        document.title = UI.docTitle[lang];
+
+        for (var i = 0; i < slides.length; i++) {
+          var html = lang === "en" ? EN_SLIDES[i] : slidePL[i];
+          if (typeof html === "string") slides[i].innerHTML = html;
+        }
+        enhanceSlides();
+
+        if (footerBrand) footerBrand.textContent = UI.footerBrand[lang];
+        if (prevBtn) prevBtn.setAttribute("aria-label", UI.prev[lang]);
+        if (nextBtn) nextBtn.setAttribute("aria-label", UI.next[lang]);
+        if (themeBtn) themeBtn.setAttribute("aria-label", UI.themeAria[lang]);
+        if (menuBtn) {
+          menuBtn.setAttribute("aria-label", UI.menuAria[lang]);
+          menuBtn.title = UI.menuTitle[lang];
+        }
+        if (menuHeading) menuHeading.textContent = UI.menuHeading[lang];
+        if (menuHint) menuHint.textContent = UI.menuHint[lang];
+        if (langBtn) {
+          langBtn.setAttribute("aria-label", UI.langAria[lang]);
+          langBtn.title = UI.langTitle[lang];
+        }
+        if (langLabel) langLabel.textContent = lang === "en" ? "PL" : "EN";
+        updateThemeTitle();
+
+        buildMenu(lang);
+
+        for (var j = 0; j < slides.length; j++) {
+          slides[j].classList.toggle("active", j === current);
+        }
+        setFragmentsVisibility(current, currentFrag);
+        updateChrome();
+      }
+      function toggleLang() {
+        applyLang(curLang === "en" ? "pl" : "en");
+      }
+      if (langBtn) langBtn.addEventListener("click", toggleLang);
 
       function setFragmentsVisibility(slideIdx, count) {
         var frags = slideFragments[slideIdx] || [];
@@ -1478,6 +2355,11 @@ npm run dev</pre>
         idx = Math.max(0, Math.min(total - 1, idx));
         var maxFrags = (slideFragments[idx] || []).length;
         fragCount = Math.max(0, Math.min(maxFrags, fragCount || 0));
+
+        // Wejście na slajd-syntezę: od przodu → świeżo (faza 0); od tyłu → pełny stan.
+        // Wyjście z niego → zatrzymaj ewentualne auto-odtwarzanie.
+        if (idx === lsIndex) lsReset(idx < current);
+        else lsClearTimer();
 
         if (idx !== current) {
           slides[current].classList.remove("active");
@@ -1511,6 +2393,7 @@ npm run dev</pre>
       }
 
       function next() {
+        if (current === lsIndex && lsStep(1)) { updateChrome(); return; }
         var frags = slideFragments[current] || [];
         if (frags.length > 0 && currentFrag === 0) {
           currentFrag = frags.length;
@@ -1522,6 +2405,7 @@ npm run dev</pre>
       }
 
       function prev() {
+        if (current === lsIndex && lsStep(-1)) { updateChrome(); return; }
         if (currentFrag > 0) {
           currentFrag = 0;
           setFragmentsVisibility(current, currentFrag);
@@ -1533,11 +2417,13 @@ npm run dev</pre>
       }
 
       /* ----- Menu z listą slajdów ----- */
-      function buildMenu() {
+      function buildMenu(lang) {
         if (!menuList) return;
         menuList.innerHTML = "";
         slides.forEach(function (slide, i) {
-          var title = slide.getAttribute("data-title") || ("Slajd " + (i + 1));
+          var title = (lang === "en" && TITLES_EN[i])
+            ? TITLES_EN[i]
+            : (slide.getAttribute("data-title") || ("Slajd " + (i + 1)));
           var li = document.createElement("li");
           var btn = document.createElement("button");
           btn.type = "button";
@@ -1586,7 +2472,7 @@ npm run dev</pre>
         if (menu && menu.classList.contains("open")) closeMenu();
         else openMenu();
       }
-      buildMenu();
+      // Menu budowane jest w applyLang() (zależy od języka).
       if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
       if (menu) {
         menu.addEventListener("click", function (e) {
@@ -1627,6 +2513,14 @@ npm run dev</pre>
         } else if (e.key === "m" || e.key === "M") {
           e.preventDefault();
           toggleMenu();
+        } else if (e.key === "l" || e.key === "L") {
+          e.preventDefault();
+          toggleLang();
+        } else if (e.key === "p" || e.key === "P") {
+          if (current === lsIndex) {
+            e.preventDefault();
+            lsPlay();
+          }
         }
       });
 
@@ -1637,11 +2531,9 @@ npm run dev</pre>
       var initial = parseInt(hash, 10);
       if (!isNaN(initial) && initial >= 1 && initial <= total) {
         current = initial - 1;
-        slides[0].classList.remove("active");
-        slides[current].classList.add("active");
       }
-      setFragmentsVisibility(current, currentFrag);
-      updateChrome();
+      // applyLang ustawia treść (PL/EN), badge'y, fragmenty, aktywny slajd i chrome.
+      applyLang(curLang);
     })();
   </script>
 </body>

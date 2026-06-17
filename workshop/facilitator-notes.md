@@ -11,6 +11,41 @@
 - [ ] Spakować `node_modules.tar.gz` (`tar -czf node_modules.tar.gz node_modules`) na pendrive. Mitygacja na wypadek wolnego/braku internetu — patrz fallback F1.
 - [ ] Sprawdzić darmowy AI copilot, którego rekomendujesz uczestnikom (ChatGPT free / Cursor free). Mieć przygotowany pre-prompt z linkiem do repo.
 - [ ] Skasować pliki `data/matches/*.json` z testów (są ignorowane przez Git, ale mogą zaśmiecać UI).
+- [ ] **Z wyprzedzeniem** (T-3 do T-1 dzień) wysłać uczestnikom przewodnik instalacji od zera — [`installation-guide.md`](./installation-guide.md) (lub wklejona treść z sekcji niżej). Pozwala dojść na warsztat z gotowym środowiskiem.
+
+## Pakiet instalacyjny dla uczestników (do wysyłki)
+
+> Skrót do skopiowania na maila / Discorda. Pełna wersja z troubleshootingiem: [`installation-guide.md`](./installation-guide.md).
+> Pokrycie: Windows + Linux. Wszystkie komendy wpisuje się w terminalu (najwygodniej w zintegrowanym terminalu edytora, `` Ctrl+` ``).
+
+**Krok 1 — Node.js LTS (≥ 20) + npm (≥ 10)** (npm instaluje się razem z Node):
+
+- Windows: `winget install OpenJS.NodeJS.LTS` (albo instalator LTS z <https://nodejs.org>).
+- Linux: `nvm install --lts` (albo `sudo apt install nodejs npm` / `sudo dnf install nodejs`).
+- Weryfikacja: `node --version` (≥ v20), `npm --version` (≥ 10). Po instalacji otwórz terminal na nowo.
+
+**Krok 2 — Git:**
+
+- Windows: `winget install Git.Git` (albo <https://git-scm.com>).
+- Linux: `sudo apt install git` / `sudo dnf install git`.
+- Weryfikacja: `git --version`.
+
+**Krok 3 — Edytor (do wyboru):** Cursor (<https://cursor.com>) albo VS Code (<https://code.visualstudio.com>) + wtyczka GitHub Copilot. Komendy z kolejnych kroków odpalasz w jego zintegrowanym terminalu.
+
+**Krok 4 — Konto AI (opcjonalne):** wbudowany Cursor (free) / GitHub Copilot / darmowy chat (<https://chatgpt.com>, <https://claude.ai>, <https://gemini.google.com>).
+
+**Krok 5 — Sklonuj i uruchom:**
+
+```bash
+git clone https://github.com/fiejkamichal/game-engine.git
+cd game-engine
+npm install
+npm run dev
+```
+
+Otwórz <http://localhost:3000>.
+
+**Weryfikacja:** strona startuje, widać listę gier, „Nowy mecz" tworzy mecz i da się zagrać.
 
 ## Materiały, które musisz mieć otwarte
 

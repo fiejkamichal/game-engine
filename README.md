@@ -7,8 +7,26 @@ Polish). One engine, two games, four agent roles, one runnable codebase.
 
 ## Quick start
 
-Requires Node LTS ≥ 20 and npm ≥ 10. No paid APIs, no database, no
-external services.
+No paid APIs, no database, no external services.
+
+### Prerequisites
+
+You need four things installed. One-line install hints for Windows
+(`winget`) and Linux (`apt`/`nvm`) below; verify each with the version
+command.
+
+| Tool | Why | Windows | Linux | Verify |
+|---|---|---|---|---|
+| **Node.js LTS ≥ 20** (ships with **npm ≥ 10**) | Runs the app and installs deps | `winget install OpenJS.NodeJS.LTS` | `nvm install --lts` (or `sudo apt install nodejs npm`) | `node --version`, `npm --version` |
+| **Git** | Clone the repo | `winget install Git.Git` | `sudo apt install git` | `git --version` |
+| **Editor** | Edit code, integrated terminal | Cursor (<https://cursor.com>) or VS Code (<https://code.visualstudio.com>) | same | open it |
+| **AI copilot account** (optional) | Vibe coding in the workshop | Cursor built-in / GitHub Copilot / free browser chat | same | log in |
+
+Never installed these before? See
+[`workshop/installation-guide.md`](workshop/installation-guide.md) for a
+full from-zero walkthrough (Windows + Linux, with troubleshooting).
+
+### Clone and run
 
 ```bash
 git clone <this-repo>

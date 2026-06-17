@@ -18,7 +18,10 @@ import { TIC_TAC_TOE_ID } from "@game-engine/tic-tac-toe";
 export type MoveBuildResult =
   | { readonly status: "ready"; readonly move: Move }
   | { readonly status: "need-more" }
-  | { readonly status: "reset"; readonly error: string };
+  // `errorKey` is a translation key under the `gameUi` namespace (see
+  // messages/*.json). The board component localizes it before display so this
+  // module — like the engine and game packages — stays language-agnostic.
+  | { readonly status: "reset"; readonly errorKey: string };
 
 export interface PieceRender {
   readonly label: string;
@@ -85,10 +88,10 @@ const checkersUi: GameUiHelpers = {
     if (cells.length === 1) {
       const piece = pieceAt(state, from);
       if (piece === null) {
-        return { status: "reset", error: "Pole jest puste. Wybierz swoją figurę." };
+        return { status: "reset", errorKey: "checkers.emptyCell" };
       }
       if (piece.owner !== state.currentPlayer) {
-        return { status: "reset", error: "To nie jest twoja figura." };
+        return { status: "reset", errorKey: "checkers.notYourPiece" };
       }
       return { status: "need-more" };
     }
@@ -113,7 +116,7 @@ const checkersUi: GameUiHelpers = {
     }
     return {
       status: "reset",
-      error: "Ruch musi być po skosie o 1 pole (krok) lub 2 pola (bicie).",
+      errorKey: "checkers.badDirection",
     };
   },
   renderPiece(piece) {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function NewMatchButton({ gameId }: Props) {
+  const t = useTranslations("actions");
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export function NewMatchButton({ gameId }: Props) {
       const state = (await res.json()) as GameState;
       router.push(`/match/${state.matchId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nieznany błąd.");
+      setError(err instanceof Error ? err.message : t("unknownError"));
       setBusy(false);
     }
   }
@@ -45,7 +47,7 @@ export function NewMatchButton({ gameId }: Props) {
         disabled={busy}
         className="btn-accent w-fit"
       >
-        {busy ? "Tworzenie…" : "Nowy mecz"}
+        {busy ? t("creating") : t("newMatch")}
       </button>
       {error !== null && (
         <p className="text-sm" style={{ color: "var(--danger)" }} role="alert">

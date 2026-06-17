@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "title": "Game Engine Workshop",
+    "description": "Turn-based game engine — workshop bootstrap for \"AI Generation in practice\"."
+  },
+  "home": {
+    "eyebrow": "AI Generation in practice",
+    "title": "Turn-based <accent>game engine</accent>",
+    "lead": "One engine, two reference games, four AI agent roles. Pick a game and start a match — state is saved to <code>data/matches/[id].json</code>.",
+    "gamesLabel": "Available games",
+    "gameCardInfo": "{rows}×{cols} board, hot-seat, two players.",
+    "footer": "Architecture: a game-agnostic engine (<code>packages/engine/</code>), games as modules (<code>packages/games/*/</code>). Adding a third game = a new folder, zero engine changes — see ADR 0001."
+  },
+  "games": {
+    "tic-tac-toe": { "name": "Tic-tac-toe" },
+    "checkers": { "name": "Checkers" }
+  },
+  "match": {
+    "title": "Match",
+    "backToList": "← Game list",
+    "missingGameTitle": "Game not in registry",
+    "missingGameBody": "This match points to game <code>{gameId}</code>, which is not in the registry (<code>apps/web/lib/games-registry.ts</code>). Check whether the package <code>packages/games/{gameId}/</code> is registered."
+  },
+  "board": {
+    "label": "Game board",
+    "turn": "Turn",
+    "winner": "Winner",
+    "result": "Result",
+    "draw": "draw",
+    "player": {
+      "white": "White",
+      "black": "Black"
+    },
+    "cellEmpty": "Cell row {row}, column {col}, empty",
+    "cellOccupied": "Cell row {row}, column {col}, occupied: {owner} {kind}",
+    "cellSelectedSuffix": ", selected",
+    "selectionProgress": "Selected {selected} of {max} cells. Click {remaining, plural, one {the last cell} other {# more cells}} to finish the move.",
+    "historyTitle": "Move history ({count})",
+    "historyEmpty": "— no moves —",
+    "unknownError": "Unknown error."
+  },
+  "actions": {
+    "newMatch": "New match",
+    "creating": "Creating…",
+    "unknownError": "Unknown error."
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "toLight": "Switch to light theme (T)",
+    "toDark": "Switch to dark theme (T)"
+  },
+  "language": {
+    "toggle": "Switch language",
+    "title": "Switch language (L)"
+  },
+  "gameUi": {
+    "checkers": {
+      "emptyCell": "This cell is empty. Pick your own piece.",
+      "notYourPiece": "That is not your piece.",
+      "badDirection": "A move must be diagonal by 1 cell (step) or 2 cells (capture)."
+    }
+  }
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import type {
@@ -19,13 +20,11 @@ interface MoveErrorBody {
   readonly error?: MoveError | string;
 }
 
-const PLAYER_LABEL: Record<string, string> = {
-  white: "Biały",
-  black: "Czarny",
-};
+type BoardTranslator = ReturnType<typeof useTranslations>;
 
-function playerLabel(player: string): string {
-  return PLAYER_LABEL[player] ?? player;
+function playerLabel(player: string, t: BoardTranslator): string {
+  const key = `player.${player}`;
+  return t.has(key) ? t(key) : player;
 }
 
 interface StatusBanner {
@@ -34,22 +33,22 @@ interface StatusBanner {
   readonly tone: "ongoing" | "win" | "draw";
 }
 
-function statusBanner(state: GameState): StatusBanner {
+function statusBanner(state: GameState, t: BoardTranslator): StatusBanner {
   switch (state.outcome.status) {
     case "ongoing":
       return {
-        prefix: "Tura",
-        value: playerLabel(state.currentPlayer),
+        prefix: t("turn"),
+        value: playerLabel(state.currentPlayer, t),
         tone: "ongoing",
       };
     case "win":
       return {
-        prefix: "Wygrał",
-        value: playerLabel(state.outcome.winner),
+        prefix: t("winner"),
+        value: playerLabel(state.outcome.winner, t),
         tone: "win",
       };
     case "draw":
-      return { prefix: "Wynik", value: "remis", tone: "draw" };
+      return { prefix: t("result"), value: t("draw"), tone: "draw" };
   }
 }
 
@@ -65,6 +64,8 @@ function toneColor(tone: StatusBanner["tone"]): string {
 }
 
 export function MatchBoard({ initialState }: Props) {
+  const t = useTranslations("board");
+  const tGameUi = useTranslations("gameUi");
   const [state, setState] = useState<GameState>(initialState);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,7 +93,7 @@ export function MatchBoard({ initialState }: Props) {
       const next = (await res.json()) as GameState;
       setState(next);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nieznany błąd.");
+      setError(err instanceof Error ? err.message : t("unknownError"));
     } finally {
       setBusy(false);
     }
@@ -118,7 +119,7 @@ export function MatchBoard({ initialState }: Props) {
       return;
     }
     setSelectedCells([]);
-    setError(result.error);
+    setError(tGameUi(result.errorKey));
   }
 
   function isSelected(row: number, col: number): boolean {
@@ -129,11 +130,11 @@ export function MatchBoard({ initialState }: Props) {
   const cols = state.board[0]?.length ?? 1;
   const cellSize = cols <= 4 ? "h-20 w-20 text-3xl" : "h-12 w-12 text-xl";
 
-  const banner = statusBanner(state);
+  const banner = statusBanner(state, t);
 
   return (
     <section
-      aria-label="Plansza gry"
+      aria-label={t("label")}
       className="flex flex-col items-center gap-6"
     >
       <p
@@ -177,11 +178,16 @@ export function MatchBoard({ initialState }: Props) {
                   onClick={() => onCellClick(rowIdx, colIdx)}
                   disabled={disabled}
                   className={`flex items-center justify-center rounded-md font-bold transition ${cellSize} ${baseCellClass} ${ringClass} disabled:cursor-not-allowed disabled:opacity-70`}
-                  aria-label={`Pole wiersz ${rowIdx + 1}, kolumna ${
-                    colIdx + 1
-                  }${
-                    cell ? `, zajęte: ${cell.owner} ${cell.kind}` : ", puste"
-                  }${selected ? ", zaznaczone" : ""}`}
+                  aria-label={`${
+                    cell
+                      ? t("cellOccupied", {
+                          row: rowIdx + 1,
+                          col: colIdx + 1,
+                          owner: cell.owner,
+                          kind: cell.kind,
+                        })
+                      : t("cellEmpty", { row: rowIdx + 1, col: colIdx + 1 })
+                  }${selected ? t("cellSelectedSuffix") : ""}`}
                 >
                   <span className={pieceRender?.className ?? ""}>
                     {pieceRender?.label ?? ""}
@@ -199,11 +205,11 @@ export function MatchBoard({ initialState }: Props) {
           style={{ color: "var(--accent)" }}
           aria-live="polite"
         >
-          Zaznaczono {selectedCells.length} z {ui.maxSelection} pól. Kliknij{" "}
-          {ui.maxSelection - selectedCells.length === 1
-            ? "ostatnie pole"
-            : `${ui.maxSelection - selectedCells.length} kolejnych pól`}{" "}
-          aby dokończyć ruch.
+          {t("selectionProgress", {
+            selected: selectedCells.length,
+            max: ui.maxSelection,
+            remaining: ui.maxSelection - selectedCells.length,
+          })}
         </p>
       )}
 
@@ -218,11 +224,11 @@ export function MatchBoard({ initialState }: Props) {
           className="text-fg-3 cursor-pointer text-sm tracking-[0.18em] uppercase"
           style={{ letterSpacing: "0.2em" }}
         >
-          Historia ruchów ({state.history.length})
+          {t("historyTitle", { count: state.history.length })}
         </summary>
         <pre className="text-xs">
           {state.history.length === 0
-            ? "— brak ruchów —"
+            ? t("historyEmpty")
             : state.history
                 .map((move, idx) => `${idx + 1}. ${JSON.stringify(move)}`)
                 .join("\n")}

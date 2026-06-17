@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import type { GameState } from "@game-engine/engine";
 
@@ -31,29 +32,35 @@ export default async function MatchPage({ params }: Props) {
   }
 
   const game = getGame(state.gameId);
+  const t = await getTranslations("match");
+  const tGames = await getTranslations("games");
+
+  const gameName = tGames.has(`${state.gameId}.name`)
+    ? tGames(`${state.gameId}.name`)
+    : (game?.displayName ?? state.gameId);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-8 px-[max(1.5rem,6vw)] py-[8vh]">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <p className="eyebrow">{game?.displayName ?? state.gameId}</p>
+          <p className="eyebrow">{gameName}</p>
           <h2 className="!mb-0">
-            Mecz <span className="accent">{state.matchId}</span>
+            {t("title")} <span className="accent">{state.matchId}</span>
           </h2>
         </div>
         <Link href="/" className="nav-btn">
-          ← Lista gier
+          {t("backToList")}
         </Link>
       </header>
 
       {game === null ? (
         <div className="card bad">
-          <h3>Brak gry w rejestrze</h3>
+          <h3>{t("missingGameTitle")}</h3>
           <p>
-            Mecz wskazuje na grę <code>{state.gameId}</code>, której nie ma w
-            rejestrze (<code>apps/web/lib/games-registry.ts</code>). Sprawdź,
-            czy paczka <code>packages/games/{state.gameId}/</code> jest
-            zarejestrowana.
+            {t.rich("missingGameBody", {
+              gameId: state.gameId,
+              code: (chunks) => <code>{chunks}</code>,
+            })}
           </p>
         </div>
       ) : (

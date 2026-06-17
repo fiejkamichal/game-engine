@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 type Theme = "dark" | "light";
@@ -24,6 +25,7 @@ function applyTheme(theme: Theme): void {
 }
 
 export function ThemeToggle() {
+  const t = useTranslations("theme");
   const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
@@ -58,16 +60,14 @@ export function ThemeToggle() {
 
   const isDark = theme === "dark";
   const icon = isDark ? ICON_MOON : ICON_SUN;
-  const title = isDark
-    ? "Przełącz na jasny motyw (T)"
-    : "Przełącz na ciemny motyw (T)";
+  const title = isDark ? t("toLight") : t("toDark");
 
   return (
     <button
       type="button"
       onClick={onClick}
       className="icon-btn"
-      aria-label="Przełącz motyw"
+      aria-label={t("toggle")}
       title={title}
     >
       <span aria-hidden="true">{icon}</span>

@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "title": "Game Engine Workshop",
+    "description": "Silnik gier turowych — bootstrap warsztatu „AI Generation w praktyce”."
+  },
+  "home": {
+    "eyebrow": "AI Generation w praktyce",
+    "title": "Silnik gier <accent>turowych</accent>",
+    "lead": "Jeden silnik, dwie gry referencyjne, cztery role agentów AI. Wybierz grę i zacznij mecz — stan zapisze się do pliku <code>data/matches/[id].json</code>.",
+    "gamesLabel": "Dostępne gry",
+    "gameCardInfo": "Plansza {rows}×{cols}, hot-seat, dwóch graczy.",
+    "footer": "Architektura: silnik agnostyczny względem gry (<code>packages/engine/</code>), gry jako moduły (<code>packages/games/*/</code>). Dodanie trzeciej gry = nowy folder, zero zmian w silniku — patrz ADR 0001."
+  },
+  "games": {
+    "tic-tac-toe": { "name": "Kółko i krzyżyk" },
+    "checkers": { "name": "Warcaby" }
+  },
+  "match": {
+    "title": "Mecz",
+    "backToList": "← Lista gier",
+    "missingGameTitle": "Brak gry w rejestrze",
+    "missingGameBody": "Mecz wskazuje na grę <code>{gameId}</code>, której nie ma w rejestrze (<code>apps/web/lib/games-registry.ts</code>). Sprawdź, czy paczka <code>packages/games/{gameId}/</code> jest zarejestrowana."
+  },
+  "board": {
+    "label": "Plansza gry",
+    "turn": "Tura",
+    "winner": "Wygrał",
+    "result": "Wynik",
+    "draw": "remis",
+    "player": {
+      "white": "Biały",
+      "black": "Czarny"
+    },
+    "cellEmpty": "Pole wiersz {row}, kolumna {col}, puste",
+    "cellOccupied": "Pole wiersz {row}, kolumna {col}, zajęte: {owner} {kind}",
+    "cellSelectedSuffix": ", zaznaczone",
+    "selectionProgress": "Zaznaczono {selected} z {max} pól. Kliknij {remaining, plural, one {ostatnie pole} other {# kolejnych pól}} aby dokończyć ruch.",
+    "historyTitle": "Historia ruchów ({count})",
+    "historyEmpty": "— brak ruchów —",
+    "unknownError": "Nieznany błąd."
+  },
+  "actions": {
+    "newMatch": "Nowy mecz",
+    "creating": "Tworzenie…",
+    "unknownError": "Nieznany błąd."
+  },
+  "theme": {
+    "toggle": "Przełącz motyw",
+    "toLight": "Przełącz na jasny motyw (T)",
+    "toDark": "Przełącz na ciemny motyw (T)"
+  },
+  "language": {
+    "toggle": "Przełącz język",
+    "title": "Przełącz język (L)"
+  },
+  "gameUi": {
+    "checkers": {
+      "emptyCell": "Pole jest puste. Wybierz swoją figurę.",
+      "notYourPiece": "To nie jest twoja figura.",
+      "badDirection": "Ruch musi być po skosie o 1 pole (krok) lub 2 pola (bicie)."
+    }
+  }
+}
